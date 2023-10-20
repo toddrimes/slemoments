@@ -354,6 +354,14 @@ class App extends Component {
                                                                       </svg>
                                                                   </Handle>
                                                                   {item.content}
+                                                                  <input
+                                                                      type="text"
+                                                                      maxLength="1"
+                                                                      style={{
+                                                                          width:
+                                                                              '20px'
+                                                                      }}
+                                                                  />
                                                               </Item>
                                                           )}
                                                       </Draggable>
