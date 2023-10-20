@@ -1,0 +1,15 @@
+{
+  "name": "react-beautiful-dnd-copy-and-drag",
+  "version": "1.0.0",
+  "description": "An example of having multiple drop targets using react-beautiful-dnd",
+  "keywords": [],
+  "homepage": "https://codesandbox.io/s/k260nyxq9v",
+  "main": "index.js",
+  "dependencies": {
+    "react": "16.3.1",
+    "react-beautiful-dnd": "10.0.4",
+    "react-dom": "16.3.1",
+    "styled-components": "3.4.9",
+    "uuid": "3.3.2"
+  }
+}
