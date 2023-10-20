@@ -232,25 +232,10 @@ class App extends Component {
                 break;
         }
 
-        /*         const delayFieldValue = document.querySelector(
-            'input[name="DelayField"]'
-        ).value; */
-
-        if (destination && delayFieldValue) {
-            // Set the initial value of the timer to the value of DelayField
-            this.setState(
-                (prevState) => ({
-                    timers: {
-                        ...prevState.timers,
-                        [result.draggableId]: parseInt(delayFieldValue, 10)
-                    }
-                }),
-                () => {
-                    // Start the animation to decrement the value
-                    this.startDecrementing(result.draggableId);
-                }
-            );
-        }
+        const delayFieldValue = Math.max(
+            1,
+            document.querySelector('#DelayField').value
+        );
     };
 
     startDecrementing = (itemId) => {
@@ -283,7 +268,7 @@ class App extends Component {
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
                 <Delay>
-                    Delay <DelayField></DelayField>
+                    Delay <DelayField id="DelayField"></DelayField>
                 </Delay>
                 <DeadZone>
                     ContentId <ContentId></ContentId>
