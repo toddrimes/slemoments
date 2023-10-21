@@ -3,6 +3,19 @@ import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {store, useGlobalState} from 'state-pool';
+
+// placeholder
+const getParentValue = (varName) => {
+    return(null);
+}
+const topURL = window.location.href;
+const isNotTop = topURL.indexOf('brb');
+
+const globalAssetId = isNotTop ? getParentValue("assetId") : "peacock_604689";
+const globalDelay = isNotTop ? getParentValue("delay") : 8;
+const globalUserId = isNotTop ? getParentValue("userId") : "206463869";
+
 // import console = require('console');
 
 // a little function to help us with reordering the result
@@ -48,7 +61,11 @@ const DeadZone = styled.div`
 `;
 
 const ContentId = styled.input`
-    width: 60px;
+  width: 150px;
+`;
+
+const UserId = styled.input`
+    width: 150px;
 `;
 
 const Content = styled.div`
@@ -57,7 +74,9 @@ const Content = styled.div`
 
 const Countdown = styled.div`
     float: right;
-    border: 1px solid black;
+    border: none;
+    text-align: center;
+    color: red;
 `;
 
 const Item = styled.div`
@@ -116,6 +135,7 @@ const Delay = styled(List)`
 
 const DelayField = styled.input`
     width: 60px;
+    text-align: right;
 `;
 
 const Kiosk = styled(List)`
@@ -186,13 +206,20 @@ const ITEMS = [
     }
 ];
 
-const topURL = window.location.href;
-const isNotTop = topURL.indexOf('brb');
 
 class App extends Component {
+    contentId = null;
+    hasContentId = this.contentId != null;
     state = {
         [uuid()]: []
     };
+
+    setContentId = (event) => {
+        console.log(event.target.value);
+        this.contentId = event.target.value;
+        if(event.target.value!=="" && event.target.value!=null) {this.hasContentId = true;} else {this.hasContentId = false;}
+        this.forceUpdate();
+    }
     onDragEnd = (result) => {
         const { source, destination } = result;
 
@@ -205,7 +232,7 @@ class App extends Component {
 
         switch (source.droppableId) {
             case destination.droppableId:
-                debugger;
+                // debugger;
                 this.setState({
                     [destination.droppableId]: reorder(
                         this.state[source.droppableId],
@@ -215,7 +242,7 @@ class App extends Component {
                 });
                 break;
             case 'ITEMS':
-                debugger;
+                // debugger;
                 if(this.state[destination.droppableId].length && destination.index!=this.state[destination.droppableId].length) break;
                 this.setState({
                     [destination.droppableId]: copy(
@@ -227,7 +254,7 @@ class App extends Component {
                 });
                 break;
             default:
-                debugger;
+                // debugger;
                 this.setState(
                     move(
                         this.state[source.droppableId],
@@ -277,11 +304,11 @@ class App extends Component {
                 {isNotTop && (
                     <React.Fragment>
                         <Delay>
-                            Delay <DelayField id="DelayField"></DelayField>
+                            Delay <DelayField id="DelayField" defaultValue={globalDelay || 8}></DelayField>
                         </Delay>
                         <DeadZone>
-                            ContentId <ContentId></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            UserId <ContentId></ContentId>
+                            ContentId <ContentId id="contentId" defaultValue={globalAssetId} onChange={this.setContentId}></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            UserId <UserId  defaultValue={globalUserId || "206463869"}></UserId>
                         </DeadZone>
                     </React.Fragment>
                 )}
@@ -290,7 +317,7 @@ class App extends Component {
                         <Kiosk
                             innerRef={provided.innerRef}
                             isDraggingOver={snapshot.isDraggingOver}>
-                            {ITEMS.map((item, index) => (
+                            {this.hasContentId && ITEMS.map((item, index) => (
                                 <Draggable
                                     key={item.id}
                                     draggableId={item.id}

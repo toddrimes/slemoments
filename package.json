@@ -6,9 +6,12 @@
   "homepage": "https://codesandbox.io/s/k260nyxq9v",
   "main": "index.js",
   "dependencies": {
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "fsevents": "^2.2.2",
     "react": "16.3.1",
     "react-beautiful-dnd": "10.0.4",
     "react-dom": "16.3.1",
+    "state-pool": "^0.10.0",
     "styled-components": "3.4.9",
     "uuid": "3.3.2"
   },
