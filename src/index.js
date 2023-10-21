@@ -186,6 +186,9 @@ const ITEMS = [
     }
 ];
 
+const topURL = window.location.href;
+const isNotTop = topURL.indexOf('brb');
+
 class App extends Component {
     state = {
         [uuid()]: []
@@ -271,13 +274,17 @@ class App extends Component {
     render() {
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
-                <Delay>
-                    Delay <DelayField id="DelayField"></DelayField>
-                </Delay>
-                <DeadZone>
-                    ContentId <ContentId></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    UserId <ContentId></ContentId>
-                </DeadZone>
+                {isNotTop && (
+                    <React.Fragment>
+                        <Delay>
+                            Delay <DelayField id="DelayField"></DelayField>
+                        </Delay>
+                        <DeadZone>
+                            ContentId <ContentId></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            UserId <ContentId></ContentId>
+                        </DeadZone>
+                    </React.Fragment>
+                )}
                 <Droppable droppableId="ITEMS" isDropDisabled={true}>
                     {(provided, snapshot) => (
                         <Kiosk
