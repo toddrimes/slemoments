@@ -211,13 +211,18 @@ class App extends Component {
     contentId = null;
     hasContentId = this.contentId != null;
     state = {
-        [uuid()]: []
+        lists: {[uuid()]: []}
     };
 
     setContentId = (event) => {
         console.log(event.target.value);
         this.contentId = event.target.value;
-        if(event.target.value!=="" && event.target.value!=null) {this.hasContentId = true;} else {this.hasContentId = false;}
+        if(event.target.value!=="" && event.target.value!=null) {
+            this.hasContentId = true;
+        } else {
+            this.hasContentId = false;
+            this.setState({"lists": {[uuid()] : []}});
+        }
         this.forceUpdate();
     }
     onDragEnd = (result) => {
@@ -235,7 +240,7 @@ class App extends Component {
                 // debugger;
                 this.setState({
                     [destination.droppableId]: reorder(
-                        this.state[source.droppableId],
+                        this.state.lists[source.droppableId],
                         source.index,
                         destination.index
                     )
@@ -243,22 +248,22 @@ class App extends Component {
                 break;
             case 'ITEMS':
                 // debugger;
-                if(this.state[destination.droppableId].length && destination.index!=this.state[destination.droppableId].length) break;
-                this.setState({
+                if(this.state.lists[destination.droppableId].length && destination.index!=this.state.lists[destination.droppableId].length) break;
+                this.setState({"lists": {
                     [destination.droppableId]: copy(
                         ITEMS,
-                        this.state[destination.droppableId],
+                        this.state.lists[destination.droppableId],
                         source,
                         destination
                     )
-                });
+                }});
                 break;
             default:
                 // debugger;
                 this.setState(
                     move(
-                        this.state[source.droppableId],
-                        this.state[destination.droppableId],
+                        this.state.lists[source.droppableId],
+                        this.state.lists[destination.droppableId],
                         source,
                         destination
                     )
@@ -346,7 +351,7 @@ class App extends Component {
                     )}
                 </Droppable>
                 <Content>
-                    {Object.keys(this.state).map((list, i) => {
+                    {Object.keys(this.state.lists).map((list, i) => {
                         console.log('==> list', list);
                         return (
                             <Droppable key={list} droppableId={list}>
@@ -356,8 +361,8 @@ class App extends Component {
                                         isDraggingOver={
                                             snapshot.isDraggingOver
                                         }>
-                                        {this.state[list].length
-                                            ? this.state[list].map(
+                                        {this.state.lists[list].length
+                                            ? this.state.lists[list].map(
                                                   (item, index) => (
                                                       <Draggable
                                                           key={item.id}
