@@ -213,7 +213,7 @@ class App extends Component {
                 break;
             case 'ITEMS':
                 debugger;
-                if(typeof destination.length !== "undefined" && destination.index!=destination.length) break;
+                if(this.state[destination.droppableId].length && destination.index!=this.state[destination.droppableId].length) break;
                 this.setState({
                     [destination.droppableId]: copy(
                         ITEMS,
