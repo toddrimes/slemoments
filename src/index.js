@@ -202,6 +202,7 @@ class App extends Component {
 
         switch (source.droppableId) {
             case destination.droppableId:
+                debugger;
                 this.setState({
                     [destination.droppableId]: reorder(
                         this.state[source.droppableId],
@@ -211,6 +212,8 @@ class App extends Component {
                 });
                 break;
             case 'ITEMS':
+                debugger;
+                if(typeof destination.length !== "undefined" && destination.index!=destination.length) break;
                 this.setState({
                     [destination.droppableId]: copy(
                         ITEMS,
@@ -221,6 +224,7 @@ class App extends Component {
                 });
                 break;
             default:
+                debugger;
                 this.setState(
                     move(
                         this.state[source.droppableId],
@@ -271,7 +275,8 @@ class App extends Component {
                     Delay <DelayField id="DelayField"></DelayField>
                 </Delay>
                 <DeadZone>
-                    ContentId <ContentId></ContentId>
+                    ContentId <ContentId></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    UserId <ContentId></ContentId>
                 </DeadZone>
                 <Droppable droppableId="ITEMS" isDropDisabled={true}>
                     {(provided, snapshot) => (
