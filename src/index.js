@@ -3,6 +3,19 @@ import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import AssetSelect from "./AssetSelect";
+
+let assets;
+async function fetchAssetsJSON() {
+    const response = await fetch('http://localhost:5500/api/dnoc/assets');
+    const assets = await response.json();
+    return assets;
+}
+fetchAssetsJSON().then(result => {
+    assets = result.items; // fetched movies
+    console.log(assets);
+});
+
 
 // placeholder
 const getParentValue = (varName) => {
@@ -307,12 +320,9 @@ class App extends Component {
             <DragDropContext onDragEnd={this.onDragEnd}>
                 {isNotTop && (
                     <React.Fragment>
-                        <Delay>
-                            Delay <DelayField id="DelayField" defaultValue={globalDelay || 8}></DelayField>
-                        </Delay>
+                        <Delay></Delay>
                         <DeadZone>
-                            ContentId <ContentId id="contentId" defaultValue={globalAssetId} onChange={this.setContentId}></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            UserId <UserId  defaultValue={globalUserId || "206463869"}></UserId>
+                            <AssetSelect></AssetSelect> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </DeadZone>
                     </React.Fragment>
                 )}
