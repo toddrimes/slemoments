@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import styled from 'styled-components';
@@ -15,6 +15,10 @@ const isNotTop = topURL.indexOf('brb');
 const globalAssetId = isNotTop ? getParentValue("assetId") : "peacock_604689";
 const globalDelay = isNotTop ? getParentValue("delay") : 8;
 const globalUserId = isNotTop ? getParentValue("userId") : "206463869";
+
+const setAssetId = (selAssetId) => {
+    this.globalAssetId = selAssetId;
+}
 
 // import console = require('console');
 
@@ -149,6 +153,17 @@ const Kiosk = styled(List)`
 const Container = styled(List)`
     margin: 0.5rem 0.5rem 1.5rem;
     background: #ccc;
+`;
+
+const ColumnHeader = styled.div`
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin: 0 0.5rem 0.5rem;
+  background: #fff;
+  color: #aaa;
 `;
 
 const Notice = styled.div`
@@ -320,6 +335,7 @@ class App extends Component {
                         <Kiosk
                             innerRef={provided.innerRef}
                             isDraggingOver={snapshot.isDraggingOver}>
+                            <ColumnHeader>E D I T O R I A L</ColumnHeader>
                             {this.hasContentId && ITEMS.map((item, index) => (
                                 <Draggable
                                     key={item.id}
@@ -410,9 +426,11 @@ class App extends Component {
                                                   )
                                               )
                                             : !provided.placeholder && (
-                                                  <Notice>
+                                                <React.Fragment>
+                                            <ColumnHeader>L A U N C H E D</ColumnHeader>
+                                            <Notice>
                                                       Drop items here
-                                                  </Notice>
+                                                  </Notice></React.Fragment>
                                               )}
                                         {provided.placeholder}
                                     </Container>
