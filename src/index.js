@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import AssetSelect from "./AssetSelect";
 
 // placeholder
 const getParentValue = (varName) => {
@@ -308,11 +309,9 @@ class App extends Component {
                 {isNotTop && (
                     <React.Fragment>
                         <Delay>
-                            Delay <DelayField id="DelayField" defaultValue={globalDelay || 8}></DelayField>
                         </Delay>
                         <DeadZone>
-                            ContentId <ContentId id="contentId" defaultValue={globalAssetId} onChange={this.setContentId}></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            UserId <UserId  defaultValue={globalUserId || "206463869"}></UserId>
+                            <AssetSelect></AssetSelect>
                         </DeadZone>
                     </React.Fragment>
                 )}
