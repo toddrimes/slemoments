@@ -1,9 +1,8 @@
-import React, { Component} from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import AssetOptions from "./AssetOptions";
 
 // placeholder
 const getParentValue = (varName) => {
@@ -207,7 +206,6 @@ const ITEMS = [
 ];
 
 
-
 class App extends Component {
     contentId = null;
     hasContentId = this.contentId != null;
@@ -313,7 +311,7 @@ class App extends Component {
                             Delay <DelayField id="DelayField" defaultValue={globalDelay || 8}></DelayField>
                         </Delay>
                         <DeadZone>
-                            ContentId <AssetOptions></AssetOptions>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            ContentId <ContentId id="contentId" defaultValue={globalAssetId} onChange={this.setContentId}></ContentId>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             UserId <UserId  defaultValue={globalUserId || "206463869"}></UserId>
                         </DeadZone>
                     </React.Fragment>
