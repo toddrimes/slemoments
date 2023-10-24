@@ -16,6 +16,7 @@ fetchAssetsJSON().then(result => {
     console.log(assets);
 });
 
+
 // placeholder
 const getParentValue = (varName) => {
     return(null);
@@ -321,7 +322,7 @@ class App extends Component {
                     <React.Fragment>
                         <Delay></Delay>
                         <DeadZone>
-                            <AssetSelect></AssetSelect>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <AssetSelect></AssetSelect> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </DeadZone>
                     </React.Fragment>
                 )}
