@@ -199,7 +199,6 @@ const ITEMS = [
     {
         id: uuid(),
         content: 'Moment 1',
-        counter: '<input type="text" maxLength="1" style={{ width: "20px" }} />'
     },
     {
         id: uuid(),
@@ -230,16 +229,37 @@ class App extends Component {
         };
     }
 
-    handleAssetSelectChange = (selectedAssetId) => {
+    handleMomentsChange = (newMoments) => {
+        this.setState({moments: newMoments});
+    }
+
+        handleAssetSelectChange = (selectedAssetId) => {
         // You can access the selectedAssetIndex value here and use it in the App component
         console.log('Selected Asset Index in App:', selectedAssetId);
         // Perform any further actions or state updates in App based on the selected value.
         if (selectedAssetId !== '' && selectedAssetId != null) {
             this.hasContentId = true;
             this.setState({contentId:  selectedAssetId});
+            let currentThis = this;
+            fetch(
+                `https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`
+            )
+                .then((response) => response.json())
+                .then((data) => {
+                    if(data.moments){
+                        let moments = data.moments;
+                        for (let i = 0; i < moments.length; i++) {
+                            moments[i].id = moments[i].momentNumber;
+                            moments[i].content = moments[i].title;
+                        }
+                        console.log(moments);
+                        this.handleMomentsChange(moments);
+                    }
+                });
         } else {
             this.hasContentId = false;
             this.setState({ lists: { [uuid()]: [] } });
+            this.setState({ items: [] });
         }
         // this.forceUpdate();
     };
@@ -364,7 +384,7 @@ class App extends Component {
                                                         provided.draggableProps
                                                             .style
                                                     }>
-                                                    {item.content}
+                                                    {"Moment " + item.id + " : \r\n"}{item.content}
                                                 </Item>
                                                 {snapshot.isDragging && (
                                                     <Clone>
