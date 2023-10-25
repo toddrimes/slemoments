@@ -156,12 +156,23 @@ const Container = styled(List)`
 const ColumnHeader = styled.div`
   display: flex;
   align-items: center;
-  align-content: center;
   justify-content: center;
-  padding: 0.5rem;
-  margin: 0 0.5rem 0.5rem;
+  color: #aaa
+  margin: 0.5rem 0.5rem 1.5rem;
+  height: 2em;
   background: #fff;
-  color: #aaa;
+  font-family: sans-serif;
+`;
+
+const LaunchedHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa
+  margin: 0.5rem 0.5rem 1.5rem 210px;
+  height: 2em;
+  background: #fff;
+  font-family: sans-serif;
 `;
 
 const Notice = styled.div`
@@ -195,7 +206,7 @@ const ButtonText = styled.div`
   margin: 0 1rem;
 `;
 
-const ITEMS = [
+let ITEMS = [
     {
         id: uuid(),
         content: 'Moment 1',
@@ -250,8 +261,9 @@ class App extends Component {
                         let moments = data.moments;
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
-                            moments[i].content = moments[i].title;
+                            moments[i].content = `Moment ${moments[i].momentNumber} : ${moments[i].title}`;
                         }
+                        ITEMS = moments;
                         console.log(moments);
                         this.handleMomentsChange(moments);
                     }
@@ -384,7 +396,7 @@ class App extends Component {
                                                         provided.draggableProps
                                                             .style
                                                     }>
-                                                    {"Moment " + item.id + " : \r\n"}{item.content}
+                                                    {item.content}
                                                 </Item>
                                                 {snapshot.isDragging && (
                                                     <Clone>
@@ -399,7 +411,7 @@ class App extends Component {
                     )}
                 </Droppable>
                 <React.Fragment>
-                    <ColumnHeader>L A U N C H E D</ColumnHeader>
+                    <LaunchedHeader>L A U N C H E D</LaunchedHeader>
                     <Content>
                         {Object.keys(this.state.lists).map((list, i) => {
                             console.log('==> list', list);
