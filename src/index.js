@@ -1,35 +1,33 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import AssetSelect from "./AssetSelect";
+import AssetSelect from './AssetSelect';
 
-// placeholder
+// Placeholder
 const getParentValue = (varName) => {
-    return(null);
-}
+    return null;
+};
 const topURL = window.location.href;
 const isNotTop = topURL.indexOf('brb');
 
-const globalAssetId = isNotTop ? getParentValue("assetId") : "peacock_604689";
-const globalDelay = isNotTop ? getParentValue("delay") : 8;
-const globalUserId = isNotTop ? getParentValue("userId") : "206463869";
+const globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
+const globalDelay = isNotTop ? getParentValue('delay') : 8;
+const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
 
 const setAssetId = (selAssetId) => {
     this.globalAssetId = selAssetId;
-}
+};
 
-// import console = require('console');
-
-// a little function to help us with reordering the result
+// A little function to help with reordering the result
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
-
     return result;
 };
+
 /**
  * Moves an item from one list to another list.
  */
@@ -59,9 +57,9 @@ const move = (source, destination, droppableSource, droppableDestination) => {
 };
 
 const DeadZone = styled.div`
-    margin-left: 200px;
-    height: 80px;
-    padding: 30px;
+  margin-left: 200px;
+  height: 80px;
+  padding: 30px;
 `;
 
 const ContentId = styled.input`
@@ -69,90 +67,90 @@ const ContentId = styled.input`
 `;
 
 const UserId = styled.input`
-    width: 150px;
+  width: 150px;
 `;
 
 const Content = styled.div`
-    margin-left: 200px;
+  margin-left: 200px;
 `;
 
 const Countdown = styled.div`
-    float: right;
-    border: none;
-    text-align: center;
-    color: red;
+  float: right;
+  border: none;
+  text-align: center;
+  color: red;
 `;
 
 const Item = styled.div`
-    display: flex;
-    justify-content: space-between;
-    user-select: none;
-    padding: 0.5rem;
-    margin: 0 0 0.5rem 0;
-    align-items: flex-start;
-    align-content: flex-start;
-    line-height: 1.5;
-    border-radius: 3px;
-    background: #fff;
-    border: 1px
-        ${(props) => (props.isDragging ? 'dashed #4099ff' : 'solid #ddd')};
+  display: flex;
+  justify-content: space-between;
+  user-select: none;
+  padding: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  align-items: flex-start;
+  align-content: flex-start;
+  line-height: 1.5;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px
+  ${(props) => (props.isDragging ? 'dashed #4099ff' : 'solid #ddd')};
 `;
 
 const Clone = styled(Item)`
-    + div {
-        display: none !important;
-    }
+  + div {
+    display: none !important;
+  }
 `;
 
 const Handle = styled.div`
-    display: flex;
-    align-items: center;
-    align-content: center;
-    user-select: none;
-    margin: -0.5rem 0.5rem -0.5rem -0.5rem;
-    padding: 0.5rem;
-    line-height: 1.5;
-    border-radius: 3px 0 0 3px;
-    background: #fff;
-    border-right: 1px solid #ddd;
-    color: #000;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  user-select: none;
+  margin: -0.5rem 0.5rem -0.5rem -0.5rem;
+  padding: 0.5rem;
+  line-height: 1.5;
+  border-radius: 3px 0 0 3px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  color: #000;
 `;
 
 const List = styled.div`
-    border: 1px
-        ${(props) => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
-    background: #fff;
-    padding: 0.5rem 0.5rem 0;
-    border-radius: 3px;
-    flex: 0 0 150px;
-    font-family: sans-serif;
+  border: 1px
+  ${(props) => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
+  background: #fff;
+  padding: 0.5rem 0.5rem 0;
+  border-radius: 3px;
+  flex: 0 0 150px;
+  font-family: sans-serif;
 `;
 
 const Delay = styled(List)`
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 80px;
-    width: 200px;
-    padding: 30px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 80px;
+  width: 200px;
+  padding: 30px;
 `;
 
 const DelayField = styled.input`
-    width: 60px;
-    text-align: right;
+  width: 60px;
+  text-align: right;
 `;
 
 const Kiosk = styled(List)`
-    position: absolute;
-    top: 80px;
-    left: 0;
-    bottom: 0;
-    width: 200px;
+  position: absolute;
+  top: 80px;
+  left: 0;
+  bottom: 0;
+  width: 200px;
 `;
 
 const Container = styled(List)`
-    margin: 0.5rem 0.5rem 1.5rem;
-    background: #ccc;
+  margin: 0.5rem 0.5rem 1.5rem;
+  background: #ccc;
 `;
 
 const ColumnHeader = styled.div`
@@ -167,41 +165,41 @@ const ColumnHeader = styled.div`
 `;
 
 const Notice = styled.div`
-    display: flex;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    padding: 0.5rem;
-    margin: 0 0.5rem 0.5rem;
-    border: 1px solid transparent;
-    line-height: 1.5;
-    color: #aaa;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  padding: 0.5rem;
+  margin: 0 0.5rem 0.5rem;
+  border: 1px solid transparent;
+  line-height: 1.5;
+  color: #aaa;
 `;
 
 const Button = styled.button`
-    display: flex;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    margin: 0.5rem;
-    padding: 0.5rem;
-    color: #000;
-    border: 1px solid #ddd;
-    background: #fff;
-    border-radius: 3px;
-    font-size: 1rem;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  color: #000;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 3px;
+  font-size: 1rem;
+  cursor: pointer;
 `;
 
 const ButtonText = styled.div`
-    margin: 0 1rem;
+  margin: 0 1rem;
 `;
 
 const ITEMS = [
     {
         id: uuid(),
         content: 'Moment 1',
-        counter: `<input type="text" maxLength="1" style={{ width: '20px' }} />`
+        counter: '<input type="text" maxLength="1" style={{ width: "20px" }} />'
     },
     {
         id: uuid(),
@@ -221,38 +219,43 @@ const ITEMS = [
     }
 ];
 
-
 class App extends Component {
-    contentId = null;
-    hasContentId = this.contentId != null;
-    state = {
-        lists: {[uuid()]: []}
-    };
+    constructor(props) {
+        super(props);
+        this.contentId = null;
+        this.hasContentId = this.contentId != null;
+        this.state = {
+            lists: { [uuid()]: [] }
+        };
+    }
 
-    setContentId = (event) => {
-        console.log(event.target.value);
-        this.contentId = event.target.value;
-        if(event.target.value!=="" && event.target.value!=null) {
+    handleAssetSelectChange = (selectedAssetId) => {
+        // You can access the selectedAssetIndex value here and use it in the App component
+        console.log('Selected Asset Index in App:', selectedAssetId);
+        // Perform any further actions or state updates in App based on the selected value.
+        if (selectedAssetId !== '' && selectedAssetId != null) {
             this.hasContentId = true;
+            this.setState({contentId:  selectedAssetId});
         } else {
             this.hasContentId = false;
-            this.setState({"lists": {[uuid()] : []}});
+            this.setState({ lists: { [uuid()]: [] } });
         }
         this.forceUpdate();
-    }
+    };
+
     onDragEnd = (result) => {
         const { source, destination } = result;
 
         console.log('==> result', result);
 
-        // dropped outside the list
+        // Dropped outside the list
         if (!destination) {
             return;
         }
 
         switch (source.droppableId) {
             case destination.droppableId:
-                // debugger;
+                // Debugger;
                 this.setState({
                     [destination.droppableId]: reorder(
                         this.state.lists[source.droppableId],
@@ -262,19 +265,26 @@ class App extends Component {
                 });
                 break;
             case 'ITEMS':
-                // debugger;
-                if(this.state.lists[destination.droppableId].length && destination.index!=this.state.lists[destination.droppableId].length) break;
-                this.setState({"lists": {
-                    [destination.droppableId]: copy(
-                        ITEMS,
-                        this.state.lists[destination.droppableId],
-                        source,
-                        destination
-                    )
-                }});
+                // Debugger;
+                if (
+                    this.state.lists[destination.droppableId].length &&
+                    destination.index !=
+                    this.state.lists[destination.droppableId].length
+                )
+                    break;
+                this.setState({
+                    lists: {
+                        [destination.droppableId]: copy(
+                            ITEMS,
+                            this.state.lists[destination.droppableId],
+                            source,
+                            destination
+                        )
+                    }
+                });
                 break;
             default:
-                // debugger;
+                // Debugger;
                 this.setState(
                     move(
                         this.state.lists[source.droppableId],
@@ -317,16 +327,19 @@ class App extends Component {
     };
 
     // Normally you would want to split things out into separate components.
-    // But in this example everything is just done in one place for simplicity
+    // But in this example, everything is just done in one place for simplicity
     render() {
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
                 {isNotTop && (
                     <React.Fragment>
-                        <Delay>
-                        </Delay>
+                        <Delay></Delay>
                         <DeadZone>
-                            <AssetSelect></AssetSelect>
+                            <AssetSelect
+                                onAssetSelectChange={
+                                    this.handleAssetSelectChange
+                                }
+                            />
                         </DeadZone>
                     </React.Fragment>
                 )}
@@ -336,110 +349,118 @@ class App extends Component {
                             innerRef={provided.innerRef}
                             isDraggingOver={snapshot.isDraggingOver}>
                             <ColumnHeader>E D I T O R I A L</ColumnHeader>
-                            {this.hasContentId && ITEMS.map((item, index) => (
-                                <Draggable
-                                    key={item.id}
-                                    draggableId={item.id}
-                                    index={index}>
-                                    {(provided, snapshot) => (
-                                        <React.Fragment>
-                                            <Item
-                                                innerRef={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                {...provided.dragHandleProps}
-                                                isDragging={snapshot.isDragging}
-                                                style={
-                                                    provided.draggableProps
-                                                        .style
-                                                }>
-                                                {item.content}
-                                            </Item>
-                                            {snapshot.isDragging && (
-                                                <Clone>{item.content}</Clone>
-                                            )}
-                                        </React.Fragment>
-                                    )}
-                                </Draggable>
-                            ))}
+                            {this.hasContentId &&
+                                ITEMS.map((item, index) => (
+                                    <Draggable
+                                        key={item.id}
+                                        draggableId={item.id}
+                                        index={index}>
+                                        {(provided, snapshot) => (
+                                            <React.Fragment>
+                                                <Item
+                                                    innerRef={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    {...provided.dragHandleProps}
+                                                    isDragging={
+                                                        snapshot.isDragging
+                                                    }
+                                                    style={
+                                                        provided.draggableProps
+                                                            .style
+                                                    }>
+                                                    {item.content}
+                                                </Item>
+                                                {snapshot.isDragging && (
+                                                    <Clone>
+                                                        {item.content}
+                                                    </Clone>
+                                                )}
+                                            </React.Fragment>
+                                        )}
+                                    </Draggable>
+                                ))}
                         </Kiosk>
                     )}
                 </Droppable>
                 <React.Fragment>
                     <ColumnHeader>L A U N C H E D</ColumnHeader>
-                <Content>
-                    {Object.keys(this.state.lists).map((list, i) => {
-                        console.log('==> list', list);
-                        return (
-                            <Droppable key={list} droppableId={list}>
-                                {(provided, snapshot) => (
-                                    <Container
-                                        innerRef={provided.innerRef}
-                                        isDraggingOver={
-                                            snapshot.isDraggingOver
-                                        }>
-                                        {this.state.lists[list].length
-                                            ? this.state.lists[list].map(
-                                                  (item, index) => (
-                                                      <Draggable
-                                                          key={item.id}
-                                                          draggableId={item.id}
-                                                          index={index}>
-                                                          {(
-                                                              provided,
-                                                              snapshot
-                                                          ) => (
-                                                              <Item
-                                                                  innerRef={
-                                                                      provided.innerRef
-                                                                  }
-                                                                  {...provided.draggableProps}
-                                                                  isDragging={
-                                                                      snapshot.isDragging
-                                                                  }
-                                                                  style={
-                                                                      provided
-                                                                          .draggableProps
-                                                                          .style
-                                                                  }>
-                                                                  <Handle
-                                                                      {...provided.dragHandleProps}>
-                                                                      <svg
-                                                                          width="24"
-                                                                          height="24"
-                                                                          viewBox="0 0 24 24">
-                                                                          <path
-                                                                              fill="currentColor"
-                                                                              d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
-                                                                          />
-                                                                      </svg>
-                                                                  </Handle>
-                                                                  {item.content}
-                                                                  <input
-                                                                      type="text"
-                                                                      maxLength="1"
-                                                                      style={{
-                                                                          width:
-                                                                              '20px'
-                                                                      }}
-                                                                  />
-                                                              </Item>
-                                                          )}
-                                                      </Draggable>
-                                                  )
-                                              )
-                                            : !provided.placeholder && (
-                                            <Notice>Drop items here</Notice>
-                                              )}
-                                        {provided.placeholder}
-                                    </Container>
-                                )}
-                            </Droppable>
-                        );
-                    })}
-                </Content>
-                    </React.Fragment>
-
-                    </DragDropContext>
+                    <Content>
+                        {Object.keys(this.state.lists).map((list, i) => {
+                            console.log('==> list', list);
+                            return (
+                                <Droppable key={list} droppableId={list}>
+                                    {(provided, snapshot) => (
+                                        <Container
+                                            innerRef={provided.innerRef}
+                                            isDraggingOver={
+                                                snapshot.isDraggingOver
+                                            }>
+                                            {this.state.lists[list].length ? (
+                                                this.state.lists[list].map(
+                                                    (item, index) => (
+                                                        <Draggable
+                                                            key={item.id}
+                                                            draggableId={
+                                                                item.id
+                                                            }
+                                                            index={index}>
+                                                            {(
+                                                                provided,
+                                                                snapshot
+                                                            ) => (
+                                                                <Item
+                                                                    innerRef={
+                                                                        provided.innerRef
+                                                                    }
+                                                                    {...provided.draggableProps}
+                                                                    isDragging={
+                                                                        snapshot.isDragging
+                                                                    }
+                                                                    style={
+                                                                        provided
+                                                                            .draggableProps
+                                                                            .style
+                                                                    }>
+                                                                    <Handle
+                                                                        {...provided.dragHandleProps}>
+                                                                        <svg
+                                                                            width="24"
+                                                                            height="24"
+                                                                            viewBox="0 0 24 24">
+                                                                            <path
+                                                                                fill="currentColor"
+                                                                                d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
+                                                                            />
+                                                                        </svg>
+                                                                    </Handle>
+                                                                    {
+                                                                        item.content
+                                                                    }
+                                                                    <input
+                                                                        type="text"
+                                                                        maxLength="1"
+                                                                        style={{
+                                                                            width:
+                                                                                '20px'
+                                                                        }}
+                                                                    />
+                                                                </Item>
+                                                            )}
+                                                        </Draggable>
+                                                    )
+                                                )
+                                            ) : !provided.placeholder ? (
+                                                <Notice>Drop items here</Notice>
+                                            ) : null}
+                                            {provided.placeholder}
+                                        </Container>
+                                    )}
+                                </Droppable>
+                            );
+                        })}
+                    </Content>
+                </React.Fragment>
+            </DragDropContext>
         );
     }
 }
