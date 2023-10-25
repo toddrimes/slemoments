@@ -225,7 +225,8 @@ class App extends Component {
         this.contentId = null;
         this.hasContentId = this.contentId != null;
         this.state = {
-            lists: { [uuid()]: [] }
+            lists: { [uuid()]: [] },
+            moments: ITEMS
         };
     }
 
@@ -240,7 +241,7 @@ class App extends Component {
             this.hasContentId = false;
             this.setState({ lists: { [uuid()]: [] } });
         }
-        this.forceUpdate();
+        // this.forceUpdate();
     };
 
     onDragEnd = (result) => {
@@ -295,11 +296,6 @@ class App extends Component {
                 );
                 break;
         }
-
-        const delayFieldValue = Math.max(
-            1,
-            document.querySelector('#DelayField').value
-        );
     };
 
     startDecrementing = (itemId) => {
@@ -350,7 +346,7 @@ class App extends Component {
                             isDraggingOver={snapshot.isDraggingOver}>
                             <ColumnHeader>E D I T O R I A L</ColumnHeader>
                             {this.hasContentId &&
-                                ITEMS.map((item, index) => (
+                                this.state.moments.map((item, index) => (
                                     <Draggable
                                         key={item.id}
                                         draggableId={item.id}
