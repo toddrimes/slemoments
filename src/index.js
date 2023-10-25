@@ -468,7 +468,9 @@ class App extends Component {
                                                                         <tr>
                                                                             <td width="20%">{item.momentNumber}</td>
                                                                             <td width="60%" align="center">{item.title}</td>
-                                                                            <td width="20%">TRIGGER</td>
+                                                                            <td width="20%">
+                                                                                <div class="trigger">TRIGGER</div>
+                                                                            </td>
                                                                         </tr>
                                                                     </table>
                                                                 </Item>
