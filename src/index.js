@@ -364,6 +364,8 @@ class App extends Component {
                         </Kiosk>
                     )}
                 </Droppable>
+                <React.Fragment>
+                    <ColumnHeader>L A U N C H E D</ColumnHeader>
                 <Content>
                     {Object.keys(this.state.lists).map((list, i) => {
                         console.log('==> list', list);
@@ -426,11 +428,7 @@ class App extends Component {
                                                   )
                                               )
                                             : !provided.placeholder && (
-                                                <React.Fragment>
-                                            <ColumnHeader>L A U N C H E D</ColumnHeader>
-                                            <Notice>
-                                                      Drop items here
-                                                  </Notice></React.Fragment>
+                                            <Notice>Drop items here</Notice>
                                               )}
                                         {provided.placeholder}
                                     </Container>
@@ -439,7 +437,9 @@ class App extends Component {
                         );
                     })}
                 </Content>
-            </DragDropContext>
+                    </React.Fragment>
+
+                    </DragDropContext>
         );
     }
 }
