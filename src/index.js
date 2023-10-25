@@ -243,9 +243,10 @@ class App extends Component {
 
     handleMomentsChange = (newMoments) => {
         this.setState({moments: newMoments});
+        this.setState({lists: { [uuid()]: [] }});
     }
 
-        handleAssetSelectChange = (selectedAssetId) => {
+    handleAssetSelectChange = (selectedAssetId) => {
         // You can access the selectedAssetIndex value here and use it in the App component
         console.log('Selected Asset Index in App:', selectedAssetId);
         // Perform any further actions or state updates in App based on the selected value.
@@ -331,29 +332,31 @@ class App extends Component {
         }
     };
 
-    startDecrementing = (itemId) => {
-        const interval = setInterval(() => {
-            this.setState((prevState) => {
-                const newTimerValue = prevState.timers[itemId] - 1;
-
-                if (newTimerValue < 0) {
-                    clearInterval(interval); // Clear interval when the value reaches 0
-                    return {};
-                }
-
-                return {
-                    timers: {
-                        ...prevState.timers,
-                        [itemId]: newTimerValue
-                    }
-                };
-            });
-        }, 1000); // Adjust the interval as needed
-    };
-
     addList = (e) => {
         this.setState({ [uuid()]: [] });
     };
+
+    componentDidMount() {
+        const triggerContainer = document.getElementById('trigger-container');
+        if (triggerContainer) {
+            triggerContainer.addEventListener('click', this.handleTriggerClick);
+        }
+    }
+
+// Define the click event handler
+    handleTriggerClick = (event) => {
+        if (event.target.classList.contains('trigger')) {
+            alert("You clicked something!");
+        }
+    }
+
+// Don't forget to remove the event listener in componentWillUnmount to avoid memory leaks.
+    componentWillUnmount() {
+        const triggerContainer = document.getElementById('trigger-container');
+        if (triggerContainer) {
+            triggerContainer.removeEventListener('click', this.handleTriggerClick);
+        }
+    }
 
     // Normally you would want to split things out into separate components.
     // But in this example, everything is just done in one place for simplicity
@@ -416,77 +419,79 @@ class App extends Component {
                 <React.Fragment>
                     <LaunchedHeader>L A U N C H E D</LaunchedHeader>
                     <Content>
-                        {Object.keys(this.state.lists).map((list, i) => {
-                            console.log('==> list', list);
-                            return (
-                                <Droppable key={list} droppableId={list}>
-                                    {(provided, snapshot) => (
-                                        <Container
-                                            innerRef={provided.innerRef}
-                                            isDraggingOver={
-                                                snapshot.isDraggingOver
-                                            }>
-                                            {this.state.lists[list].length ? (
-                                                this.state.lists[list].map(
-                                                    (item, index) => (
-                                                        <Draggable
-                                                            key={item.id}
-                                                            draggableId={
-                                                                item.id
-                                                            }
-                                                            index={index}>
-                                                            {(
-                                                                provided,
-                                                                snapshot
-                                                            ) => (
-                                                                <Item
-                                                                    innerRef={
-                                                                        provided.innerRef
-                                                                    }
-                                                                    {...provided.draggableProps}
-                                                                    isDragging={
-                                                                        snapshot.isDragging
-                                                                    }
-                                                                    style={
-                                                                        provided
-                                                                            .draggableProps
-                                                                            .style
-                                                                    }>
-                                                                    <Handle
-                                                                        {...provided.dragHandleProps}>
-                                                                        <svg
-                                                                            width="24"
-                                                                            height="24"
-                                                                            viewBox="0 0 24 24">
-                                                                            <path
-                                                                                fill="currentColor"
-                                                                                d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
-                                                                            />
-                                                                        </svg>
-                                                                    </Handle>
-                                                                    <table width="100%">
-                                                                        <tr>
-                                                                            <td width="20%">{item.momentNumber}</td>
-                                                                            <td width="60%" align="center">{item.title}</td>
-                                                                            <td width="20%">
-                                                                                <div class="trigger">TRIGGER</div>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </Item>
-                                                            )}
-                                                        </Draggable>
+                        <div id="trigger-container"> {/* This is the parent element */}
+                            {Object.keys(this.state.lists).map((list, i) => {
+                                console.log('==> list', list);
+                                return (
+                                    <Droppable key={list} droppableId={list}>
+                                        {(provided, snapshot) => (
+                                            <Container
+                                                innerRef={provided.innerRef}
+                                                isDraggingOver={
+                                                    snapshot.isDraggingOver
+                                                }>
+                                                {this.state.lists[list].length ? (
+                                                    this.state.lists[list].map(
+                                                        (item, index) => (
+                                                            <Draggable
+                                                                key={item.id}
+                                                                draggableId={
+                                                                    item.id
+                                                                }
+                                                                index={index}>
+                                                                {(
+                                                                    provided,
+                                                                    snapshot
+                                                                ) => (
+                                                                    <Item
+                                                                        innerRef={
+                                                                            provided.innerRef
+                                                                        }
+                                                                        {...provided.draggableProps}
+                                                                        isDragging={
+                                                                            snapshot.isDragging
+                                                                        }
+                                                                        style={
+                                                                            provided
+                                                                                .draggableProps
+                                                                                .style
+                                                                        }>
+                                                                        <Handle
+                                                                            {...provided.dragHandleProps}>
+                                                                            <svg
+                                                                                width="24"
+                                                                                height="24"
+                                                                                viewBox="0 0 24 24">
+                                                                                <path
+                                                                                    fill="currentColor"
+                                                                                    d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
+                                                                                />
+                                                                            </svg>
+                                                                        </Handle>
+                                                                        <table width="100%">
+                                                                            <tr>
+                                                                                <td width="20%">{item.momentNumber}</td>
+                                                                                <td width="60%" align="center">{item.title}</td>
+                                                                                <td width="20%">
+                                                                                    <div className="trigger">LAUNCH</div>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </table>
+                                                                    </Item>
+                                                                )}
+                                                            </Draggable>
+                                                        )
                                                     )
-                                                )
-                                            ) : !provided.placeholder ? (
-                                                <Notice>Drop items here</Notice>
-                                            ) : null}
-                                            {provided.placeholder}
-                                        </Container>
-                                    )}
-                                </Droppable>
-                            );
-                        })}
+                                                ) : !provided.placeholder ? (
+                                                    <Notice>Drop items here</Notice>
+                                                ) : null}
+                                                {provided.placeholder}
+                                            </Container>
+                                        )}
+                                    </Droppable>
+                                );
+                            })}
+                        </div>
                     </Content>
                 </React.Fragment>
             </DragDropContext>
