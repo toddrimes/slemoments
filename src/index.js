@@ -261,7 +261,7 @@ class App extends Component {
                         let moments = data.moments;
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
-                            moments[i].content = `<subtitle>Moment ${moments[i].momentNumber}</subtitle><title>${moments[i].title}</title>`;
+                            moments[i].content = `Moment ${moments[i].momentNumber} : ${moments[i].title}`;
                         }
                         ITEMS = moments;
                         console.log(moments);
