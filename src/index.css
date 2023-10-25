@@ -1,0 +1,14 @@
+ilabel, .ilabel {
+    float: left;
+    top: 0;
+    border: none;
+    color: red;
+}
+ititle, .ititle {
+    float: right;
+    text-align: right;
+    bottom: 0;
+    border: none;
+    color: black;
+    font-size: 0.9em;
+}

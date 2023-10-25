@@ -4,6 +4,7 @@ import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AssetSelect from './AssetSelect';
+import './index.css';
 
 // Placeholder
 const getParentValue = (varName) => {
@@ -258,10 +259,10 @@ class App extends Component {
                 .then((response) => response.json())
                 .then((data) => {
                     if(data.moments){
-                        let moments = data.moments;
+                        let moments = data.moments.sort((a,b) => a.momentNumber-b.momentNumber);
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
-                            moments[i].content = `Moment ${moments[i].momentNumber} : ${moments[i].title}`;
+                            moments[i].content = `<label>Moment ${moments[i].momentNumber}</label><title>${moments[i].title}</title>`;
                         }
                         ITEMS = moments;
                         console.log(moments);
@@ -396,11 +397,13 @@ class App extends Component {
                                                         provided.draggableProps
                                                             .style
                                                     }>
-                                                    {item.content}
+                                                    <ilabel>{item.momentNumber}</ilabel>
+                                                    <ititle>{item.title}</ititle>
                                                 </Item>
                                                 {snapshot.isDragging && (
                                                     <Clone>
-                                                        {item.content}
+                                                        <ilabel>{item.momentNumber}</ilabel>
+                                                        <ititle>{item.title}</ititle>
                                                     </Clone>
                                                 )}
                                             </React.Fragment>
@@ -461,17 +464,13 @@ class App extends Component {
                                                                             />
                                                                         </svg>
                                                                     </Handle>
-                                                                    {
-                                                                        item.content
-                                                                    }
-                                                                    <input
-                                                                        type="text"
-                                                                        maxLength="1"
-                                                                        style={{
-                                                                            width:
-                                                                                '20px'
-                                                                        }}
-                                                                    />
+                                                                    <table width="100%">
+                                                                        <tr>
+                                                                            <td width="20%">{item.momentNumber}</td>
+                                                                            <td width="60%" align="center">{item.title}</td>
+                                                                            <td width="20%">TRIGGER</td>
+                                                                        </tr>
+                                                                    </table>
                                                                 </Item>
                                                             )}
                                                         </Draggable>
