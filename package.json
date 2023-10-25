@@ -27,6 +27,7 @@
     "eject": "react-scripts eject"
   },
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": "8.19.3"
   }
 }
