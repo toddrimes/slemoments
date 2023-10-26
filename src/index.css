@@ -12,3 +12,9 @@ ititle, .ititle {
     color: black;
     font-size: 0.9em;
 }
+.swap {
+    height: 12px;
+}
+.trash {
+    height: 12px;
+}

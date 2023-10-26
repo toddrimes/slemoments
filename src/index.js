@@ -92,7 +92,6 @@ const Item = styled.div`
   margin: 0 0 0.5rem 0;
   align-items: flex-start;
   align-content: flex-start;
-  line-height: 1.5;
   border-radius: 3px;
   background: #fff;
   border: 1px
@@ -490,10 +489,16 @@ class App extends Component {
                                                                         </Handle>
                                                                         <table width="100%">
                                                                             <tr>
-                                                                                <td width="20%">{item.momentNumber}</td>
-                                                                                <td width="60%" align="center">{item.title}</td>
+                                                                                <td width="10%">{item.momentNumber}</td>
+                                                                                <td width="40%" align="center">{item.title}</td>
                                                                                 <td width="20%">
                                                                                     <div className="trigger">LAUNCH</div>
+                                                                                </td>
+                                                                                <td width="10%">
+                                                                                    <img class="swap" src="../images/swap.png"/>
+                                                                                </td>
+                                                                                <td width="10%">
+                                                                                    <img className="trash" src="../images/trash.png"/>
                                                                                 </td>
                                                                             </tr>
                                                                         </table>
@@ -521,3 +526,9 @@ class App extends Component {
 
 // Put the things into the DOM!
 ReactDOM.render(<App />, document.getElementById('root'));
+
+/*
+SWAP icon: <a href="https://iconscout.com/icons/swap" class="text-underline font-size-sm" target="_blank">Swap</a> by <a href="https://iconscout.com/contributors/daniel-bruce" class="text-underline font-size-sm" target="_blank">Daniel Bruce</a>
+
+TRASH ICON <a href="https://iconscout.com/icons/trash" class="text-underline font-size-sm" target="_blank">Trash</a> by <a href="https://iconscout.com/contributors/amit-jakhu" class="text-underline font-size-sm" target="_blank">Amit Jakhu</a>
+ */
