@@ -134,7 +134,6 @@ const Delay = styled(List)`
   left: 0;
   height: 80px;
   width: 200px;
-  padding: 30px;
 `;
 
 const DelayField = styled.input`
@@ -383,7 +382,9 @@ class App extends Component {
             <DragDropContext onDragEnd={this.onDragEnd}>
                 {isNotTop && (
                     <React.Fragment>
-                        <Delay></Delay>
+                        <Delay>
+                            <div class="logo"></div>
+                        </Delay>
                         <DeadZone>
                             <AssetSelect
                                 onAssetSelectChange={
