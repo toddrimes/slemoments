@@ -9,7 +9,6 @@
       "version": "0.0.1",
       "dependencies": {
         "eslint-plugin-jsx-a11y": "^6.7.1",
-        "fsevents": "^2.2.2",
         "react": "^16.14.0",
         "react-beautiful-dnd": "10.0.4",
         "react-dom": "^16.14.0",
@@ -5537,7 +5536,9 @@
       "version": "2.3.3",
       "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
       "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
+      "dev": true,
       "hasInstallScript": true,
+      "optional": true,
       "os": [
         "darwin"
       ],
@@ -22360,7 +22361,9 @@
     "fsevents": {
       "version": "2.3.3",
       "resolved": "https://registry.npmjs.org/fsevents/-/fsevents-2.3.3.tgz",
-      "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw=="
+      "integrity": "sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==",
+      "dev": true,
+      "optional": true
     },
     "function-bind": {
       "version": "1.1.2",
