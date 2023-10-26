@@ -397,7 +397,7 @@ class App extends Component {
                 <Droppable droppableId="ITEMS" isDropDisabled={true}>
                     {(provided, snapshot) => (
                         <Kiosk
-                            innerRef={provided.innerRef}
+                            ref={provided.innerRef}
                             isDraggingOver={snapshot.isDraggingOver}>
                             <ColumnHeader>E D I T O R I A L</ColumnHeader>
                             {this.hasContentId &&
@@ -409,7 +409,7 @@ class App extends Component {
                                         {(provided, snapshot) => (
                                             <React.Fragment>
                                                 <Item
-                                                    innerRef={provided.innerRef}
+                                                    ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                     isDragging={
@@ -445,7 +445,7 @@ class App extends Component {
                                     <Droppable key={list} droppableId={list}>
                                         {(provided, snapshot) => (
                                             <Container
-                                                innerRef={provided.innerRef}
+                                                ref={provided.innerRef}
                                                 isDraggingOver={
                                                     snapshot.isDraggingOver
                                                 }>
@@ -463,7 +463,7 @@ class App extends Component {
                                                                     snapshot
                                                                 ) => (
                                                                     <Item
-                                                                        innerRef={
+                                                                        ref={
                                                                             provided.innerRef
                                                                         }
                                                                         {...provided.draggableProps}
