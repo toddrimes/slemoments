@@ -265,7 +265,7 @@ class App extends Component {
                         let moments = data.moments.sort((a,b) => a.momentNumber-b.momentNumber);
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
-                            moments[i].content = `<label>Moment ${moments[i].momentNumber}</label><title>${moments[i].title}</title>`;
+                            // moments[i].content = `<label>Moment ${moments[i].momentNumber}</label><title>${moments[i].title}</title>`;
                         }
                         ITEMS = moments;
                         console.log(moments);
@@ -359,7 +359,6 @@ class App extends Component {
             let updatedTime = this.updateTime(globalDelay);
             let glds = globalLaunchDelayMinutes * 60 * 1000;
             let nextPossibleLaunch = this.state.lastLaunch + glds;
-            debugger;
             if(updatedTime.ms >= nextPossibleLaunch) {
                 this.setState({"lastLaunch": updatedTime.ms});
                 alert(`Launching at ${updatedTime.ms} or ${updatedTime.human}`);
@@ -419,13 +418,13 @@ class App extends Component {
                                                         provided.draggableProps
                                                             .style
                                                     }>
-                                                    <ilabel>{item.momentNumber}</ilabel>
-                                                    <ititle>{item.title}</ititle>
+                                                    <div className="ilabel">{item.momentNumber}</div>
+                                                    <div className="ititle">{item.title}</div>
                                                 </Item>
                                                 {snapshot.isDragging && (
                                                     <Clone>
-                                                        <ilabel>{item.momentNumber}</ilabel>
-                                                        <ititle>{item.title}</ititle>
+                                                        <div className="ilabel">{item.momentNumber}</div>
+                                                        <div className="ititle">{item.title}</div>
                                                     </Clone>
                                                 )}
                                             </React.Fragment>
@@ -488,6 +487,7 @@ class App extends Component {
                                                                             </svg>
                                                                         </Handle>
                                                                         <table width="100%">
+                                                                            <tbody>
                                                                             <tr>
                                                                                 <td width="10%">{item.momentNumber}</td>
                                                                                 <td width="40%" align="center">{item.title}</td>
@@ -498,9 +498,10 @@ class App extends Component {
                                                                                     <span className="material-symbols-outlined">find_replace</span>
                                                                                 </td>
                                                                                 <td width="10%">
-                                                                                    <span class="material-symbols-outlined">delete</span>
+                                                                                    <span className="material-symbols-outlined">delete</span>
                                                                                 </td>
                                                                             </tr>
+                                                                            </tbody>
                                                                         </table>
                                                                     </Item>
                                                                 )}
