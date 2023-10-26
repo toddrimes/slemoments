@@ -495,10 +495,10 @@ class App extends Component {
                                                                                     <div className="trigger">LAUNCH</div>
                                                                                 </td>
                                                                                 <td width="10%">
-                                                                                    <img class="swap" src="../images/swap.png"/>
+                                                                                    <span className="material-symbols-outlined">find_replace</span>
                                                                                 </td>
                                                                                 <td width="10%">
-                                                                                    <img className="trash" src="../images/trash.png"/>
+                                                                                    <span class="material-symbols-outlined">delete</span>
                                                                                 </td>
                                                                             </tr>
                                                                         </table>
