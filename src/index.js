@@ -8,13 +8,15 @@ import './index.css';
 
 // Placeholder
 const getParentValue = (varName) => {
-    return null;
+    return false;
 };
 const topURL = window.location.href;
 const isNotTop = topURL.indexOf('brb');
 
 const globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
 const globalDelay = isNotTop ? getParentValue('delay') : 8;
+// const globalLaunchDelayMinutes = isNotTop ? getParentValue('launchDelayMinutes') : 1;
+const globalLaunchDelayMinutes = 0.25;
 const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
 
 const setAssetId = (selAssetId) => {
@@ -237,7 +239,8 @@ class App extends Component {
         this.hasContentId = this.contentId != null;
         this.state = {
             lists: { [uuid()]: [] },
-            moments: ITEMS
+            moments: ITEMS,
+            lastLaunch: 0
         };
     }
 
@@ -343,10 +346,27 @@ class App extends Component {
         }
     }
 
+    updateTime (secondsToAdd = 0) {
+        let currentTime = new Date();
+        let currentTimeMillis = currentTime.getTime() + (secondsToAdd * 1000);
+        let currentUTCTime = new Date(currentTimeMillis).toUTCString();
+
+        return {"ms": currentTimeMillis, "human": currentUTCTime};
+    }
+
 // Define the click event handler
     handleTriggerClick = (event) => {
         if (event.target.classList.contains('trigger')) {
-            alert("You clicked something!");
+            let updatedTime = this.updateTime(globalDelay);
+            let glds = globalLaunchDelayMinutes * 60 * 1000;
+            let nextPossibleLaunch = this.state.lastLaunch + glds;
+            debugger;
+            if(updatedTime.ms >= nextPossibleLaunch) {
+                this.setState({"lastLaunch": updatedTime.ms});
+                alert(`Launching at ${updatedTime.ms} or ${updatedTime.human}`);
+            } else {
+                alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
+            }
         }
     }
 
