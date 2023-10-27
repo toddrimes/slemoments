@@ -41,8 +41,24 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
     const destClone = Array.from(destination);
     const item = sourceClone[droppableSource.index];
 
+
+    // Add new fields to the copied item if they don't exist
+    if(!item.hasOwnProperty("phase")) item.phase = "staged";
+    if(!item.hasOwnProperty("timecode")) item.timecode = 9999999999999;
+
     destClone.splice(droppableDestination.index, 0, { ...item, id: uuid() });
     return destClone;
+};
+
+// Define a sorting function based on the fields you want to sort by
+const sortList = (list) => {
+    list.map((item, index) => item.currentIndex = index.toString().padStart(2,'0'));
+    return list.sort((a, b) => {
+        // Replace 'field1', 'field2', 'field3' with the actual field names you want to sort by
+        const valueA = a.phase + a.timecode + a.currentIndex;
+        const valueB = b.phase + b.timecode + b.currentIndex;
+        return valueA.localeCompare(valueB);
+    });
 };
 
 const move = (source, destination, droppableSource, droppableDestination) => {
@@ -95,6 +111,9 @@ const Item = styled.div`
   align-content: flex-start;
   border-radius: 3px;
   background: #fff;
+  min-height: 60px;
+  max-height: 60px;
+  overflow: clip;
   border: 1px
   ${(props) => (props.isDragging ? 'dashed #4099ff' : 'solid #ddd')};
 `;
@@ -370,6 +389,18 @@ class App extends Component {
                 item.classList.add("launched");
                 launchDiv.innerHTML="";
                 launchDiv.innerHTML=new Date(updatedTime.ms).toLocaleTimeString('en-US');
+                let listId = Object.keys(this.state.lists)[0];
+                let thisList = this.state.lists[listId];
+                let rawItemId = itemId.split(':')[0];
+                let rawIndex = itemId.split(':')[1];
+                thisList.map((item, index) => {
+                    if(item.id == rawItemId && index == rawIndex) {
+                        item.phase = "launched";
+                        item.timecode = updatedTime.ms;
+                    }
+                })
+                let sortedList = sortList(thisList);
+                this.setState({ lists: { [listId]: sortedList } });
             } else {
                 alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
             }
@@ -449,7 +480,7 @@ class App extends Component {
                     <Content>
                         <div id="trigger-container"> {/* This is the parent element */}
                             {Object.keys(this.state.lists).map((list, i) => {
-                                console.log('==> list', list);
+                                const sortedList = sortList(this.state.lists[list]);
                                 return (
                                     <Droppable key={list} droppableId={list}>
                                         {(provided, snapshot) => (
@@ -458,8 +489,8 @@ class App extends Component {
                                                 isDraggingOver={
                                                     snapshot.isDraggingOver
                                                 }>
-                                                {this.state.lists[list].length ? (
-                                                    this.state.lists[list].map(
+                                                {sortedList.length ? (
+                                                    sortedList.map(
                                                         (item, index) => (
                                                             <Draggable
                                                                 key={item.id}

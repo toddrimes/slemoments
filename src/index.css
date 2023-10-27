@@ -149,3 +149,7 @@ ititle, .ititle {
 .staged .swapButton, .launched .launchButton {
     display: none;
 }
+
+div.launched, div.staged {
+    min-height: 55px;
+}
