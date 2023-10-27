@@ -405,6 +405,18 @@ class App extends Component {
                 alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
             }
         }
+        let deleteParentNodeClassName = event.target.parentNode.className;
+        if (deleteParentNodeClassName.indexOf('deleteButton') > -1) {
+            let updatedTime = this.updateTime(0);
+            let itemId =  event.target.parentNode.getAttribute("data-id");
+            if(itemId) {
+                let rawIndex = itemId.split(':')[1];
+                let listId = Object.keys(this.state.lists)[0];
+                let thisList = this.state.lists[listId];
+                thisList.splice(rawIndex,1);
+                this.setState({ lists: { [listId]: thisList } });
+            }
+        }
     }
 
 // Don't forget to remove the event listener in componentWillUnmount to avoid memory leaks.
