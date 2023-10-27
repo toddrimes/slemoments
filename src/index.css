@@ -54,6 +54,7 @@ ititle, .ititle {
     width: 10%;
     flex-grow: 1;
     position: relative;
+    text-align: center;
 }
 .column-4 {
     width: 10%;
