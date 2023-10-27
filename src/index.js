@@ -403,7 +403,7 @@ class App extends Component {
                         </DeadZone>
                     </React.Fragment>
                 )}
-                <Droppable droppableId="ITEMS" isDropDisabled={true} isCombineEnabled>
+                <Droppable droppableId="ITEMS" isDropDisabled={true}>
                     {(provided, snapshot) => (
                         <Kiosk
                             ref={provided.innerRef}
@@ -451,7 +451,7 @@ class App extends Component {
                             {Object.keys(this.state.lists).map((list, i) => {
                                 console.log('==> list', list);
                                 return (
-                                    <Droppable key={list} droppableId={list} isCombineEnabled>
+                                    <Droppable key={list} droppableId={list}>
                                         {(provided, snapshot) => (
                                             <Container
                                                 ref={provided.innerRef}
@@ -539,5 +539,7 @@ class App extends Component {
 ReactDOM.render(<App />, document.getElementById('root'));
 
 /*
-Need to implement this for COMBINING draggable items: https://github.com/atlassian/react-beautiful-dnd/blob/HEAD/docs/guides/combining.md OR https://stackoverflow.com/a/65504904
+SWAP icon: <a href="https://iconscout.com/icons/swap" class="text-underline font-size-sm" target="_blank">Swap</a> by <a href="https://iconscout.com/contributors/daniel-bruce" class="text-underline font-size-sm" target="_blank">Daniel Bruce</a>
+
+TRASH ICON <a href="https://iconscout.com/icons/trash" class="text-underline font-size-sm" target="_blank">Trash</a> by <a href="https://iconscout.com/contributors/amit-jakhu" class="text-underline font-size-sm" target="_blank">Amit Jakhu</a>
  */
