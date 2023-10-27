@@ -85,6 +85,7 @@ const Countdown = styled.div`
 `;
 
 const Item = styled.div`
+  position: relative;
   display: flex;
   justify-content: space-between;
   user-select: none;
@@ -158,7 +159,7 @@ const ColumnHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa
+  color: #aaa;
   margin: 0.5rem 0.5rem 1.5rem;
   height: 2em;
   background: #fff;
@@ -169,7 +170,7 @@ const LaunchedHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaa
+  color: #aaa;
   margin: 0.5rem 0.5rem 1.5rem 210px;
   height: 2em;
   background: #fff;
@@ -193,7 +194,7 @@ const Button = styled.button`
   align-items: center;
   align-content: center;
   justify-content: center;
-  margin: 0.5rem;
+  /* margin: 0.5rem; */
   padding: 0.5rem;
   color: #000;
   border: 1px solid #ddd;
@@ -360,7 +361,15 @@ class App extends Component {
             let nextPossibleLaunch = this.state.lastLaunch + glds;
             if(updatedTime.ms >= nextPossibleLaunch) {
                 this.setState({"lastLaunch": updatedTime.ms});
-                alert(`Launching at ${updatedTime.ms} or ${updatedTime.human}`);
+                // alert(`Launching at ${updatedTime.ms} or ${updatedTime.human}`);
+                let itemId =  event.target.getAttribute("data-id");
+                let item = document.getElementById(`${itemId}`);
+                let launchDiv = document.getElementById(`timecode:${itemId}`);
+                let timeDiv = document.createDocumentFragment(`<div classname="cvh" style="text-align: center">${updatedTime.human}</div>`);
+                item.classList.remove("staged");
+                item.classList.add("launched");
+                launchDiv.innerHTML="";
+                launchDiv.innerHTML=new Date(updatedTime.ms).toLocaleTimeString('en-US');
             } else {
                 alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
             }
@@ -474,7 +483,7 @@ class App extends Component {
                                                                             provided
                                                                                 .draggableProps
                                                                                 .style
-                                                                        }>
+                                                                        } className="staged" id={item.id + ":" +index}>
                                                                         <Handle
                                                                             {...provided.dragHandleProps}>
                                                                             <svg
@@ -487,23 +496,23 @@ class App extends Component {
                                                                                 />
                                                                             </svg>
                                                                         </Handle>
-                                                                        <table width="100%">
-                                                                            <tbody>
-                                                                            <tr>
-                                                                                <td width="10%">{item.momentNumber}</td>
-                                                                                <td width="40%" align="center">{item.title}</td>
-                                                                                <td width="20%">
-                                                                                    <div className="trigger">LAUNCH</div>
-                                                                                </td>
-                                                                                <td width="10%">
+                                                                        <div className="flex-row cvh">
+                                                                            <div className="column-1"><div className="cvh">{item.momentNumber}</div></div>
+                                                                            <div className="column-2"><div className="cvh">{item.title}</div></div>
+                                                                            <div className="column-3" id={"timecode:" + item.id + ":" +index} data-id={item.id + ":" +index}>
+                                                                                <a href="#" className="trigger cvh launchButton" data-id={item.id + ":" +index}>LAUNCH</a>
+                                                                            </div>
+                                                                            <div className="column-4">
+                                                                                <a href="#" className="trigger cvh swapButton" data-id={item.id + ":" +index}>
                                                                                     <span className="material-symbols-outlined">find_replace</span>
-                                                                                </td>
-                                                                                <td width="10%">
+                                                                                </a>
+                                                                            </div>
+                                                                            <div className="column-5">
+                                                                                <a href="#" className="trigger cvh deleteButton" data-id={item.id + ":" +index}>
                                                                                     <span className="material-symbols-outlined">delete</span>
-                                                                                </td>
-                                                                            </tr>
-                                                                            </tbody>
-                                                                        </table>
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
                                                                     </Item>
                                                                 )}
                                                             </Draggable>

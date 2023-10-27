@@ -32,3 +32,119 @@ ititle, .ititle {
      background-position: top;
      width: 180px;
  }
+ .launch {
+
+ }
+.flex-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    position: relative;
+}
+.column-1 {
+    width: 10%;
+    position: relative;
+}
+.column-2 {
+    width: 60%;
+    flex-grow: 1;
+    position: relative;
+}
+.column-3 {
+    width: 10%;
+    flex-grow: 1;
+    position: relative;
+}
+.column-4 {
+    width: 10%;
+    flex-grow: 1;
+    position: relative;
+}
+.column-5 {
+    width: 10%;
+    flex-grow: 1;
+    position: relative;
+}
+.cvh {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.swapButton {
+    box-shadow:inset 0px 1px 0px 0px #e08b02;
+    background:linear-gradient(to bottom, #f87503 5%, #e08b02 100%);
+    background-color: #f87503;
+    border-radius:6px;
+    border:1px solid #f87503;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:2px 4px;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #ffee66;
+}
+.swapButton:hover {
+    background:linear-gradient(to bottom, #ffab23 5%, #ffec64 100%);
+    background-color:#ffab23;
+}
+.swapButton:active {
+    box-shadow: 2px 2px 5px #fc894d;
+}
+
+.launchButton {
+    box-shadow:inset 0px 1px 0px 0px #a4e271;
+    background:linear-gradient(to bottom, #89c403 5%, #77a809 100%);
+    background-color:#89c403;
+    border-radius:6px;
+    border:1px solid #74b807;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:6px 24px;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #528009;
+}
+.launchButton:hover {
+    background:linear-gradient(to bottom, #77a809 5%, #89c403 100%);
+    background-color:#77a809;
+}
+.launchButton:active {
+    box-shadow: 2px 2px 5px #fc894d;
+}
+
+.deleteButton {
+    box-shadow:inset 0px 1px 0px 0px #f5978e;
+    background:linear-gradient(to bottom, #f24537 5%, #c62d1f 100%);
+    background-color:#f24537;
+    border-radius:6px;
+    border:1px solid #d02718;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:2px 4px;
+    text-decoration:none;
+    text-shadow:0px 1px 0px #810e05;
+}
+.deleteButton:hover {
+    background:linear-gradient(to bottom, #c62d1f 5%, #f24537 100%);
+    background-color:#c62d1f;
+}
+.deleteButton:active {
+    box-shadow: 2px 2px 5px #fc894d;
+}
+
+.staged .swapButton, .launched .launchButton {
+    display: none;
+}
