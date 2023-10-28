@@ -300,8 +300,21 @@ class App extends Component {
 
     onDragEnd = (result) => {
         const { source, destination } = result;
-
         console.log('==> result', result);
+
+        if (result.combine) {
+            // super simple: just removing the dragging item
+
+            let listId = Object.keys(this.state.lists)[0];
+            let thisList = this.state.lists[listId];
+
+            // to remove the item being dragged
+            thisList.splice(result.source.index, 1);
+
+            this.setState({ lists: { [listId]: thisList } });
+
+            return;
+        }
 
         // Dropped outside the list
         if (!destination) {
