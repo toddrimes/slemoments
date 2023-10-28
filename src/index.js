@@ -547,12 +547,12 @@ class App extends Component {
                                                                                 <a href="#" className="trigger cvh launchButton" data-id={item.id + ":" +index}>LAUNCH</a>
                                                                             </div>
                                                                             <div className="column-4">
-                                                                                <a href="#" className="trigger cvh swapButton" data-id={item.id + ":" +index}>
+                                                                                <a href="#" className="cvh swapButton" data-id={item.id + ":" +index}>
                                                                                     <span className="material-symbols-outlined">find_replace</span>
                                                                                 </a>
                                                                             </div>
                                                                             <div className="column-5">
-                                                                                <a href="#" className="trigger cvh deleteButton" data-id={item.id + ":" +index}>
+                                                                                <a href="#" className="cvh deleteButton" data-id={item.id + ":" +index}>
                                                                                     <span className="material-symbols-outlined">delete</span>
                                                                                 </a>
                                                                             </div>
