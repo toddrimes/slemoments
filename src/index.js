@@ -41,12 +41,11 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
     const destClone = Array.from(destination);
     const item = sourceClone[droppableSource.index];
 
-
     // Add new fields to the copied item if they don't exist
     if(!item.hasOwnProperty("phase")) item.phase = "staged";
     if(!item.hasOwnProperty("timecode")) item.timecode = 9999999999999;
 
-    destClone.splice(droppableDestination.index, 0, { ...item, id: uuid() });
+    destClone.splice(droppableDestination.index, 0, { ...item, id: uuid(), isCombineEnabled: true });
     return destClone;
 };
 
@@ -396,6 +395,7 @@ class App extends Component {
                 thisList.map((item, index) => {
                     if(item.id == rawItemId && index == rawIndex) {
                         item.phase = "launched";
+                        item.isCombineEnabled = true;
                         item.timecode = updatedTime.ms;
                     }
                 })
@@ -495,7 +495,7 @@ class App extends Component {
                             {Object.keys(this.state.lists).map((list, i) => {
                                 const sortedList = sortList(this.state.lists[list]);
                                 return (
-                                    <Droppable key={list} droppableId={list}>
+                                    <Droppable key={list} droppableId={list} isCombineEnabled>
                                         {(provided, snapshot) => (
                                             <Container
                                                 ref={provided.innerRef}
@@ -527,7 +527,7 @@ class App extends Component {
                                                                             provided
                                                                                 .draggableProps
                                                                                 .style
-                                                                        } className="staged" id={item.id + ":" +index}>
+                                                                        } className={item.phase} id={item.id + ":" +index}>
                                                                         <Handle
                                                                             {...provided.dragHandleProps}>
                                                                             <svg
