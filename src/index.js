@@ -441,6 +441,7 @@ class App extends Component {
                     let thisList = this.state.lists[listId];
                     thisList.splice(rawIndex,1);
                     this.setState({ lists: { [listId]: thisList } });
+                    // TODO: Post something to the backend API to remove the just-deleted moment/execution
                 }
             }
         }
