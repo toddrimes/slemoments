@@ -345,12 +345,13 @@ class App extends Component {
                 break;
             case 'ITEMS':
                 // Debugger;
-                if (
+                // TODO: UNCOMMENT the following if yo want to PREVENT insertion of a moment from the left between staged/launched items on the right
+                /*if (
                     this.state.lists[destination.droppableId].length &&
                     destination.index !=
                     this.state.lists[destination.droppableId].length
                 )
-                    break;
+                    break;*/
                 this.setState({
                     lists: {
                         [destination.droppableId]: copy(
