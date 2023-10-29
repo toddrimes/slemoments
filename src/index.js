@@ -7,7 +7,8 @@ import './index.css';
 import { v4 as uuid } from 'uuid';
 import io from "socket.io-client";
 
-let socket;
+// Initialize Socket.io connection
+const socket = io("http://localhost:5501", {});
 
 const getParentValue = (varName) => {
     return false;
@@ -20,6 +21,8 @@ let globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
 const globalDelay = isNotTop ? getParentValue('delay') : 8;
 const globalLaunchDelayMinutes = 0.25;
 const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
+
+let lastLaunch = 0 - (globalLaunchDelayMinutes * 60 * 1000);
 
 const setAssetId = (selAssetId) => {
     globalAssetId = selAssetId;
@@ -246,8 +249,7 @@ const App = () => {
     const [hasContentId, setHasContentId] = useState(false);
     const [state, setState] = useState({
         lists: { [uuid()]: [] },
-        moments: ITEMS,
-        lastLaunch: 0,
+        moments: ITEMS
     });
 
     const handleMomentsChange = (newMoments) => {
@@ -256,6 +258,14 @@ const App = () => {
             moments: newMoments,
             lists: { [uuid()]: [] },
         }));
+
+        // Emit the new state to the server
+        socket.emit('stateChange', {
+            moments: newMoments,
+            lists: { [uuid()]: [] },
+            // Include any other relevant data in the emitted state
+        });
+        // debugger;
     };
 
     const handleAssetSelectChange = (selectedAssetId) => {
@@ -278,6 +288,14 @@ const App = () => {
                         ITEMS = moments;
                         console.log(moments);
                         handleMomentsChange(moments);
+
+                        // Emit the new state to the server
+                        socket.emit('stateChange', {
+                            moments: moments,
+                            lists: { [uuid()]: [] },
+                            // Include any other relevant data in the emitted state
+                        });
+                        // debugger;
                     }
                 });
         } else {
@@ -322,6 +340,7 @@ const App = () => {
 
         switch (source.droppableId) {
             case destination.droppableId:
+                console.log("switch01");
                 setState((prevState) => ({
                     ...prevState,
                     [destination.droppableId]: reorder(
@@ -332,6 +351,7 @@ const App = () => {
                 }));
                 break;
             case 'ITEMS':
+                console.log("switch01");
                 setState((prevState) => ({
                     ...prevState,
                     lists: {
@@ -345,6 +365,7 @@ const App = () => {
                 }));
                 break;
             default:
+                console.log("switch01");
                 setState(
                     move(
                         state.lists[source.droppableId],
@@ -365,33 +386,16 @@ const App = () => {
     };
 
     useEffect(() => {
-       /* const triggerCollection = document.getElementsByClassName('trigger');
-        const trashCollection = document.getElementsByClassName('trash');
-        if(triggerCollection.length > 0 && trashCollection.length > 0){
-            debugger;
-            if (triggerCollection.length > 0) {
-                for (let i = 0; i < triggerCollection.length; i++) {
-                    triggerCollection[i].addEventListener('click', handleTriggerClick);
-                }
-            }
-            if (trashCollection.length > 0) {
-                for (let i = 0; i < trashCollection.length; i++) {
-                    trashCollection[i].addEventListener('click', handleTrashClick);
-                }
-            }
-            return () => {
-                if (triggerCollection.length > 0) {
-                    for (let i = 0; i < triggerCollection.length; i++) {
-                        triggerCollection[i].removeEventListener('click', handleTriggerClick);
-                    }
-                }
-                if (trashCollection.length > 0) {
-                    for (let i = 0; i < trashCollection.length; i++) {
-                        trashCollection[i].removeEventListener('click', handleTrashClick);
-                    }
-                }
-            };
-        }*/
+        // Listen for changes from the server
+        socket.on('stateChange', (newState) => {
+            // Update your local state with the newState received from the server
+            setState(newState);
+        });
+
+        // Clean up the socket connection when the component unmounts
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const updateTime = (secondsToAdd = 0) => {
@@ -420,12 +424,13 @@ const App = () => {
     const handleTriggerClick = (event) => {
         let updatedTime = updateTime(globalDelay);
         let glds = globalLaunchDelayMinutes * 60 * 1000;
-        let nextPossibleLaunch = state.lastLaunch + glds;
+        debugger;
+        let nextPossibleLaunch = lastLaunch + glds;
         if (updatedTime.ms >= nextPossibleLaunch) {
             setState((prevState) => ({
                 ...prevState,
-                lastLaunch: updatedTime.ms,
             }));
+            lastLaunch = updatedTime.ms;
 
             let itemId = event.target.getAttribute('data-id');
             let item = document.getElementById(`${itemId}`);
@@ -439,7 +444,6 @@ const App = () => {
             launchDiv.innerHTML = '';
             launchDiv.innerHTML = new Date(updatedTime.ms).toLocaleTimeString('en-US');
 
-            debugger;
             let listId = Object.keys(state.lists)[0];
             let thisList = state.lists[listId];
             let rawItemId = itemId.split(':')[0];
