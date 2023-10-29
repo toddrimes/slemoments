@@ -304,12 +304,23 @@ class App extends Component {
 
         if (result.combine) {
             // super simple: just removing the dragging item
-
+            // debugger;
+            let targetId = result.combine.draggableId;
+            // let sourceId = result.combine.droppableId;
+            let itemsSourceIndex = result.source.index;
+            let sourceObject = ITEMS[itemsSourceIndex];
             let listId = Object.keys(this.state.lists)[0];
             let thisList = this.state.lists[listId];
-
+            for(let j=0; j < thisList.length;j++){
+                if(thisList[j].id==targetId) {
+                    // if(thisList[j].phase!=="launched") return;
+                    thisList[j].momentNumber = sourceObject.momentNumber;
+                    thisList[j].title = sourceObject.title;
+                    // TODO: POST a moment/execution Update here IFF the target moment phase is "launched".
+                }
+            }
             // to remove the item being dragged
-            thisList.splice(result.source.index, 1);
+            // thisList.splice(result.source.index, 1);
 
             this.setState({ lists: { [listId]: thisList } });
 
