@@ -421,6 +421,8 @@ class App extends Component {
                         item.phase = "launched";
                         item.isCombineEnabled = true;
                         item.timecode = updatedTime.ms;
+                        // TODO: Post the moment/execution
+                        // TODO: Some kind of polling for status of the just-posted execution
                     }
                 })
                 let sortedList = sortList(thisList);
@@ -571,9 +573,9 @@ class App extends Component {
                                                                                 <a href="#" className="trigger cvh launchButton" data-id={item.id + ":" +index}>LAUNCH</a>
                                                                             </div>
                                                                             <div className="column-4">
-                                                                                <a href="#" className="cvh swapButton" data-id={item.id + ":" +index}>
+                                                                                {/* <a href="#" className="cvh swapButton" data-id={item.id + ":" +index}>
                                                                                     <span className="material-symbols-outlined">find_replace</span>
-                                                                                </a>
+                                                                                </a> */}
                                                                             </div>
                                                                             <div className="column-5">
                                                                                 <a href="#" className="cvh deleteButton" data-id={item.id + ":" +index}>
