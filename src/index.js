@@ -313,7 +313,7 @@ class App extends Component {
             let thisList = this.state.lists[listId];
             for(let j=0; j < thisList.length;j++){
                 if(thisList[j].id==targetId) {
-                    // if(thisList[j].phase!=="launched") return;
+                    if(thisList[j].phase!=="launched") return;
                     thisList[j].momentNumber = sourceObject.momentNumber;
                     thisList[j].title = sourceObject.title;
                     // TODO: POST a moment/execution Update here IFF the target moment phase is "launched".
@@ -433,7 +433,7 @@ class App extends Component {
             }
         } else {
             let deleteParentNodeClassName = event.target.parentNode.className;
-            if (deleteParentNodeClassName.indexOf('deleteButton') > -1) {
+            if (deleteParentNodeClassName && deleteParentNodeClassName.indexOf('deleteButton') > -1) {
                 let updatedTime = this.updateTime(0);
                 let itemId =  event.target.parentNode.getAttribute("data-id");
                 if(itemId) {
