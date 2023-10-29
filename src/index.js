@@ -1,29 +1,30 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import uuid from 'uuid/v4';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AssetSelect from './AssetSelect';
 import './index.css';
+import { v4 as uuid } from 'uuid';
+import io from "socket.io-client";
 
-// Placeholder
+let socket;
+
 const getParentValue = (varName) => {
     return false;
 };
+
 const topURL = window.location.href;
 const isNotTop = topURL.indexOf('brb');
 
-const globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
+let globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
 const globalDelay = isNotTop ? getParentValue('delay') : 8;
-// const globalLaunchDelayMinutes = isNotTop ? getParentValue('launchDelayMinutes') : 1;
 const globalLaunchDelayMinutes = 0.25;
 const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
 
 const setAssetId = (selAssetId) => {
-    this.globalAssetId = selAssetId;
+    globalAssetId = selAssetId;
 };
 
-// A little function to help with reordering the result
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
@@ -31,9 +32,6 @@ const reorder = (list, startIndex, endIndex) => {
     return result;
 };
 
-/**
- * Moves an item from one list to another list.
- */
 const copy = (source, destination, droppableSource, droppableDestination) => {
     console.log('==> dest', destination);
 
@@ -41,19 +39,16 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
     const destClone = Array.from(destination);
     const item = sourceClone[droppableSource.index];
 
-    // Add new fields to the copied item if they don't exist
-    if(!item.hasOwnProperty("phase")) item.phase = "staged";
-    if(!item.hasOwnProperty("timecode")) item.timecode = 9999999999999;
+    if (!item.hasOwnProperty("phase")) item.phase = "staged";
+    if (!item.hasOwnProperty("timecode")) item.timecode = 9999999999999;
 
     destClone.splice(droppableDestination.index, 0, { ...item, id: uuid(), isCombineEnabled: true });
     return destClone;
 };
 
-// Define a sorting function based on the fields you want to sort by
 const sortList = (list) => {
-    list.map((item, index) => item.currentIndex = index.toString().padStart(2,'0'));
+    list.map((item, index) => item.currentIndex = index.toString().padStart(2, '0'));
     return list.sort((a, b) => {
-        // Replace 'field1', 'field2', 'field3' with the actual field names you want to sort by
         const valueA = a.phase + a.timecode + a.currentIndex;
         const valueB = b.phase + b.timecode + b.currentIndex;
         return valueA.localeCompare(valueB);
@@ -113,8 +108,7 @@ const Item = styled.div`
   min-height: 60px;
   max-height: 60px;
   overflow: clip;
-  border: 1px
-  ${(props) => (props.isDragging ? 'dashed #4099ff' : 'solid #ddd')};
+  border: 1px ${(props) => (props.isDragging ? 'dashed #4099ff' : 'solid #ddd')};
 `;
 
 const Clone = styled(Item)`
@@ -138,8 +132,7 @@ const Handle = styled.div`
 `;
 
 const List = styled.div`
-  border: 1px
-  ${(props) => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
+  border: 1px ${(props) => (props.isDraggingOver ? 'dashed #000' : 'solid #ddd')};
   background: #fff;
   padding: 0.5rem 0.5rem 0;
   border-radius: 3px;
@@ -212,7 +205,6 @@ const Button = styled.button`
   align-items: center;
   align-content: center;
   justify-content: center;
-  /* margin: 0.5rem; */
   padding: 0.5rem;
   color: #000;
   border: 1px solid #ddd;
@@ -249,126 +241,114 @@ let ITEMS = [
     }
 ];
 
-class App extends Component {
-    constructor(props) {
-        super(props);
-        this.contentId = null;
-        this.hasContentId = this.contentId != null;
-        this.state = {
+const App = () => {
+    const [contentId, setContentId] = useState(null);
+    const [hasContentId, setHasContentId] = useState(false);
+    const [state, setState] = useState({
+        lists: { [uuid()]: [] },
+        moments: ITEMS,
+        lastLaunch: 0,
+    });
+
+    const handleMomentsChange = (newMoments) => {
+        setState((prevState) => ({
+            ...prevState,
+            moments: newMoments,
             lists: { [uuid()]: [] },
-            moments: ITEMS,
-            lastLaunch: 0
-        };
-    }
+        }));
+    };
 
-    handleMomentsChange = (newMoments) => {
-        this.setState({moments: newMoments});
-        this.setState({lists: { [uuid()]: [] }});
-    }
-
-    handleAssetSelectChange = (selectedAssetId) => {
-        // You can access the selectedAssetIndex value here and use it in the App component
+    const handleAssetSelectChange = (selectedAssetId) => {
         console.log('Selected Asset Index in App:', selectedAssetId);
-        // Perform any further actions or state updates in App based on the selected value.
+
         if (selectedAssetId !== '' && selectedAssetId != null) {
-            this.hasContentId = true;
-            this.setState({contentId:  selectedAssetId});
-            let currentThis = this;
+            setHasContentId(true);
+            setContentId(selectedAssetId);
+
             fetch(
                 `https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`
             )
                 .then((response) => response.json())
                 .then((data) => {
-                    if(data.moments){
-                        let moments = data.moments.sort((a,b) => a.momentNumber-b.momentNumber);
+                    if (data.moments) {
+                        let moments = data.moments.sort((a, b) => a.momentNumber - b.momentNumber);
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
-                            // moments[i].content = `<label>Moment ${moments[i].momentNumber}</label><title>${moments[i].title}</title>`;
                         }
                         ITEMS = moments;
                         console.log(moments);
-                        this.handleMomentsChange(moments);
+                        handleMomentsChange(moments);
                     }
                 });
         } else {
-            this.hasContentId = false;
-            this.setState({ lists: { [uuid()]: [] } });
-            this.setState({ items: [] });
+            setHasContentId(false);
+            setState((prevState) => ({
+                ...prevState,
+                lists: { [uuid()]: [] },
+                items: [],
+            }));
         }
-        // this.forceUpdate();
     };
 
-    onDragEnd = (result) => {
+    const onDragEnd = (result) => {
         const { source, destination } = result;
         console.log('==> result', result);
 
         if (result.combine) {
-            // super simple: just removing the dragging item
-            // debugger;
             let targetId = result.combine.draggableId;
-            // let sourceId = result.combine.droppableId;
             let itemsSourceIndex = result.source.index;
             let sourceObject = ITEMS[itemsSourceIndex];
-            let listId = Object.keys(this.state.lists)[0];
-            let thisList = this.state.lists[listId];
-            for(let j=0; j < thisList.length;j++){
-                if(thisList[j].id==targetId) {
-                    // if(thisList[j].phase!=="launched") return;
+            let listId = Object.keys(state.lists)[0];
+            let thisList = state.lists[listId];
+
+            for (let j = 0; j < thisList.length; j++) {
+                if (thisList[j].id === targetId) {
                     thisList[j].momentNumber = sourceObject.momentNumber;
                     thisList[j].title = sourceObject.title;
-                    // TODO: POST a moment/execution Update here IFF the target moment phase is "launched".
                 }
             }
-            // to remove the item being dragged
-            // thisList.splice(result.source.index, 1);
 
-            this.setState({ lists: { [listId]: thisList } });
+            setState((prevState) => ({
+                ...prevState,
+                lists: { [listId]: thisList },
+            }));
 
             return;
         }
 
-        // Dropped outside the list
         if (!destination) {
             return;
         }
 
         switch (source.droppableId) {
             case destination.droppableId:
-                // Debugger;
-                this.setState({
+                setState((prevState) => ({
+                    ...prevState,
                     [destination.droppableId]: reorder(
-                        this.state.lists[source.droppableId],
+                        state.lists[source.droppableId],
                         source.index,
                         destination.index
-                    )
-                });
+                    ),
+                }));
                 break;
             case 'ITEMS':
-                // Debugger;
-                // TODO: UNCOMMENT the following if yo want to PREVENT insertion of a moment from the left between staged/launched items on the right
-                /*if (
-                    this.state.lists[destination.droppableId].length &&
-                    destination.index !=
-                    this.state.lists[destination.droppableId].length
-                )
-                    break;*/
-                this.setState({
+                setState((prevState) => ({
+                    ...prevState,
                     lists: {
                         [destination.droppableId]: copy(
-                            ITEMS,
-                            this.state.lists[destination.droppableId],
+                            state.moments,
+                            state.lists[destination.droppableId],
                             source,
                             destination
-                        )
-                    }
-                });
+                        ),
+                    },
+                }));
                 break;
             default:
-                // Debugger;
-                this.setState(
+                setState(
                     move(
-                        this.state.lists[source.droppableId],
-                        this.state.lists[destination.droppableId],
+                        state.lists[source.droppableId],
+                        state.lists[destination.droppableId],
                         source,
                         destination
                     )
@@ -377,241 +357,225 @@ class App extends Component {
         }
     };
 
-    addList = (e) => {
-        this.setState({ [uuid()]: [] });
+    const addList = (e) => {
+        setState((prevState) => ({
+            ...prevState,
+            [uuid()]: [],
+        }));
     };
 
-    componentDidMount() {
-        const triggerContainer = document.getElementById('trigger-container');
-        if (triggerContainer) {
-            triggerContainer.addEventListener('click', this.handleTriggerClick);
-        }
-    }
-
-    updateTime (secondsToAdd = 0) {
-        let currentTime = new Date();
-        let currentTimeMillis = currentTime.getTime() + (secondsToAdd * 1000);
-        let currentUTCTime = new Date(currentTimeMillis).toUTCString();
-
-        return {"ms": currentTimeMillis, "human": currentUTCTime};
-    }
-
-// Define the click event handler
-    handleTriggerClick = (event) => {
-        if (event.target.classList.contains('trigger')) {
-            let updatedTime = this.updateTime(globalDelay);
-            let glds = globalLaunchDelayMinutes * 60 * 1000;
-            let nextPossibleLaunch = this.state.lastLaunch + glds;
-            if(updatedTime.ms >= nextPossibleLaunch) {
-                this.setState({"lastLaunch": updatedTime.ms});
-                // alert(`Launching at ${updatedTime.ms} or ${updatedTime.human}`);
-                let itemId =  event.target.getAttribute("data-id");
-                let item = document.getElementById(`${itemId}`);
-                let launchDiv = document.getElementById(`timecode:${itemId}`);
-                let timeDiv = document.createDocumentFragment(`<div classname="cvh" style="text-align: center">${updatedTime.human}</div>`);
-                item.classList.remove("staged");
-                item.classList.add("launched");
-                launchDiv.innerHTML="";
-                launchDiv.innerHTML=new Date(updatedTime.ms).toLocaleTimeString('en-US');
-                let listId = Object.keys(this.state.lists)[0];
-                let thisList = this.state.lists[listId];
-                let rawItemId = itemId.split(':')[0];
-                let rawIndex = itemId.split(':')[1];
-                thisList.map((item, index) => {
-                    if(item.id == rawItemId && index == rawIndex) {
-                        item.phase = "launched";
-                        item.isCombineEnabled = true;
-                        item.timecode = updatedTime.ms;
-                        // TODO: Post the moment/execution
-                        // TODO: Some kind of polling for status of the just-posted execution
-                    }
-                })
-                let sortedList = sortList(thisList);
-                this.setState({ lists: { [listId]: sortedList } });
-            } else {
-                alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
-            }
-        } else {
-            let deleteParentNodeClassName = event.target.parentNode.className;
-            if (deleteParentNodeClassName.indexOf('deleteButton') > -1) {
-                let updatedTime = this.updateTime(0);
-                let itemId =  event.target.parentNode.getAttribute("data-id");
-                if(itemId) {
-                    let rawIndex = itemId.split(':')[1];
-                    let listId = Object.keys(this.state.lists)[0];
-                    let thisList = this.state.lists[listId];
-                    thisList.splice(rawIndex,1);
-                    this.setState({ lists: { [listId]: thisList } });
-                    // TODO: Post something to the backend API to remove the just-deleted moment/execution
+    useEffect(() => {
+       /* const triggerCollection = document.getElementsByClassName('trigger');
+        const trashCollection = document.getElementsByClassName('trash');
+        if(triggerCollection.length > 0 && trashCollection.length > 0){
+            debugger;
+            if (triggerCollection.length > 0) {
+                for (let i = 0; i < triggerCollection.length; i++) {
+                    triggerCollection[i].addEventListener('click', handleTriggerClick);
                 }
             }
-        }
-    }
+            if (trashCollection.length > 0) {
+                for (let i = 0; i < trashCollection.length; i++) {
+                    trashCollection[i].addEventListener('click', handleTrashClick);
+                }
+            }
+            return () => {
+                if (triggerCollection.length > 0) {
+                    for (let i = 0; i < triggerCollection.length; i++) {
+                        triggerCollection[i].removeEventListener('click', handleTriggerClick);
+                    }
+                }
+                if (trashCollection.length > 0) {
+                    for (let i = 0; i < trashCollection.length; i++) {
+                        trashCollection[i].removeEventListener('click', handleTrashClick);
+                    }
+                }
+            };
+        }*/
+    }, []);
 
-// Don't forget to remove the event listener in componentWillUnmount to avoid memory leaks.
-    componentWillUnmount() {
-        const triggerContainer = document.getElementById('trigger-container');
-        if (triggerContainer) {
-            triggerContainer.removeEventListener('click', this.handleTriggerClick);
-        }
-    }
+    const updateTime = (secondsToAdd = 0) => {
+        let currentTime = new Date();
+        let currentTimeMillis = currentTime.getTime() + secondsToAdd * 1000;
+        let currentUTCTime = new Date(currentTimeMillis).toUTCString();
 
-    // Normally you would want to split things out into separate components.
-    // But in this example, everything is just done in one place for simplicity
-    render() {
-        return (
-            <DragDropContext onDragEnd={this.onDragEnd}>
-                {isNotTop && (
-                    <React.Fragment>
-                        <Delay>
-                            <div class="logo"></div>
-                        </Delay>
-                        <DeadZone>
-                            <AssetSelect
-                                onAssetSelectChange={
-                                    this.handleAssetSelectChange
-                                }
-                            />
-                        </DeadZone>
-                    </React.Fragment>
-                )}
-                <Droppable droppableId="ITEMS" isDropDisabled={true}>
-                    {(provided, snapshot) => (
-                        <Kiosk
-                            ref={provided.innerRef}
-                            isDraggingOver={snapshot.isDraggingOver}>
-                            <ColumnHeader>E D I T O R I A L</ColumnHeader>
-                            {this.hasContentId &&
-                                this.state.moments.map((item, index) => (
-                                    <Draggable
-                                        key={item.id}
-                                        draggableId={item.id}
-                                        index={index}>
-                                        {(provided, snapshot) => (
-                                            <React.Fragment>
-                                                <Item
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    isDragging={
-                                                        snapshot.isDragging
-                                                    }
-                                                    style={
-                                                        provided.draggableProps
-                                                            .style
-                                                    }>
+        return { ms: currentTimeMillis, human: currentUTCTime };
+    };
+
+    const handleTrashClick = (event) => {
+        let updatedTime = updateTime(0);
+        let itemId = event.target.parentNode.getAttribute('data-id');
+        if (itemId) {
+            let rawIndex = itemId.split(':')[1];
+            let listId = Object.keys(state.lists)[0];
+            let thisList = state.lists[listId];
+            thisList.splice(rawIndex, 1);
+            setState((prevState) => ({
+                ...prevState,
+                lists: { [listId]: thisList },
+            }));
+        }
+    };
+
+    const handleTriggerClick = (event) => {
+        let updatedTime = updateTime(globalDelay);
+        let glds = globalLaunchDelayMinutes * 60 * 1000;
+        let nextPossibleLaunch = state.lastLaunch + glds;
+        if (updatedTime.ms >= nextPossibleLaunch) {
+            setState((prevState) => ({
+                ...prevState,
+                lastLaunch: updatedTime.ms,
+            }));
+
+            let itemId = event.target.getAttribute('data-id');
+            let item = document.getElementById(`${itemId}`);
+            let launchDiv = document.getElementById(`timecode:${itemId}`);
+            let timeDiv = document.createDocumentFragment(
+                `<div classname="cvh" style="text-align: center">${updatedTime.human}</div>`
+            );
+
+            item.classList.remove('staged');
+            item.classList.add('launched');
+            launchDiv.innerHTML = '';
+            launchDiv.innerHTML = new Date(updatedTime.ms).toLocaleTimeString('en-US');
+
+            debugger;
+            let listId = Object.keys(state.lists)[0];
+            let thisList = state.lists[listId];
+            let rawItemId = itemId.split(':')[0];
+            let rawIndex = itemId.split(':')[1];
+
+            let counter = 0;
+            for(let k = 0; k < thisList.length; k++) {
+                if (thisList[k].id == rawItemId && counter == rawIndex) {
+                    thisList[k].phase = 'launched';
+                    thisList[k].isCombineEnabled = true;
+                    thisList[k].timecode = updatedTime.ms;
+                }
+                counter++;
+            }
+
+            let sortedList = sortList(thisList);
+
+            setState((prevState) => ({
+                ...prevState,
+                lists: { [listId]: sortedList },
+            }));
+        } else {
+            alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
+        }
+    };
+
+    return (
+        <DragDropContext onDragEnd={onDragEnd}>
+            {isNotTop && (
+                <React.Fragment>
+                    <Delay>
+                        <div class="logo"></div>
+                    </Delay>
+                    <DeadZone>
+                        <AssetSelect onAssetSelectChange={handleAssetSelectChange} />
+                    </DeadZone>
+                </React.Fragment>
+            )}
+            <Droppable droppableId="ITEMS" isDropDisabled={true}>
+                {(provided, snapshot) => (
+                    <Kiosk ref={provided.innerRef} isDraggingOver={snapshot.isDraggingOver}>
+                        <ColumnHeader>E D I T O R I A L</ColumnHeader>
+                        {hasContentId &&
+                            state.moments.map((item, index) => (
+                                <Draggable key={item.id} draggableId={item.id} index={index}>
+                                    {(provided, snapshot) => (
+                                        <React.Fragment>
+                                            <Item
+                                                ref={provided.innerRef}
+                                                {...provided.draggableProps}
+                                                {...provided.dragHandleProps}
+                                                isDragging={snapshot.isDragging}
+                                                style={provided.draggableProps.style}>
+                                                <div className="ilabel">{item.momentNumber}</div>
+                                                <div className="ititle">{item.title}</div>
+                                            </Item>
+                                            {snapshot.isDragging && (
+                                                <Clone>
                                                     <div className="ilabel">{item.momentNumber}</div>
                                                     <div className="ititle">{item.title}</div>
-                                                </Item>
-                                                {snapshot.isDragging && (
-                                                    <Clone>
-                                                        <div className="ilabel">{item.momentNumber}</div>
-                                                        <div className="ititle">{item.title}</div>
-                                                    </Clone>
-                                                )}
-                                            </React.Fragment>
-                                        )}
-                                    </Draggable>
-                                ))}
-                        </Kiosk>
-                    )}
-                </Droppable>
-                <React.Fragment>
-                    <LaunchedHeader>L A U N C H E D</LaunchedHeader>
-                    <Content>
-                        <div id="trigger-container"> {/* This is the parent element */}
-                            {Object.keys(this.state.lists).map((list, i) => {
-                                const sortedList = sortList(this.state.lists[list]);
-                                return (
-                                    <Droppable key={list} droppableId={list} isCombineEnabled>
-                                        {(provided, snapshot) => (
-                                            <Container
-                                                ref={provided.innerRef}
-                                                isDraggingOver={
-                                                    snapshot.isDraggingOver
-                                                }>
-                                                {sortedList.length ? (
-                                                    sortedList.map(
-                                                        (item, index) => (
-                                                            <Draggable
-                                                                key={item.id}
-                                                                draggableId={
-                                                                    item.id
-                                                                }
-                                                                index={index}>
-                                                                {(
-                                                                    provided,
-                                                                    snapshot
-                                                                ) => (
-                                                                    <Item
-                                                                        ref={
-                                                                            provided.innerRef
-                                                                        }
-                                                                        {...provided.draggableProps}
-                                                                        isDragging={
-                                                                            snapshot.isDragging
-                                                                        }
-                                                                        style={
-                                                                            provided
-                                                                                .draggableProps
-                                                                                .style
-                                                                        } className={item.phase} id={item.id + ":" +index}>
-                                                                        <Handle
-                                                                            {...provided.dragHandleProps}>
-                                                                            <svg
-                                                                                width="24"
-                                                                                height="24"
-                                                                                viewBox="0 0 24 24">
-                                                                                <path
-                                                                                    fill="currentColor"
-                                                                                    d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
-                                                                                />
-                                                                            </svg>
-                                                                        </Handle>
-                                                                        <div className="flex-row cvh">
-                                                                            <div className="column-1"><div className="cvh">{item.momentNumber}</div></div>
-                                                                            <div className="column-2"><div className="cvh">{item.title}</div></div>
-                                                                            <div className="column-3" id={"timecode:" + item.id + ":" +index} data-id={item.id + ":" +index}>
-                                                                                <a href="#" className="trigger cvh launchButton" data-id={item.id + ":" +index}>LAUNCH</a>
-                                                                            </div>
-                                                                            <div className="column-4">
-                                                                                {/* <a href="#" className="cvh swapButton" data-id={item.id + ":" +index}>
-                                                                                    <span className="material-symbols-outlined">find_replace</span>
-                                                                                </a> */}
-                                                                            </div>
-                                                                            <div className="column-5">
-                                                                                <a href="#" className="cvh deleteButton" data-id={item.id + ":" +index}>
-                                                                                    <span className="material-symbols-outlined">delete</span>
-                                                                                </a>
-                                                                            </div>
-                                                                        </div>
-                                                                    </Item>
-                                                                )}
-                                                            </Draggable>
-                                                        )
-                                                    )
-                                                ) : !provided.placeholder ? (
-                                                    <Notice>Drop items here</Notice>
-                                                ) : null}
-                                                {provided.placeholder}
-                                            </Container>
-                                        )}
-                                    </Droppable>
-                                );
-                            })}
-                        </div>
-                    </Content>
-                </React.Fragment>
-            </DragDropContext>
-        );
-    }
-}
+                                                </Clone>
+                                            )}
+                                        </React.Fragment>
+                                    )}
+                                </Draggable>
+                            ))}
+                    </Kiosk>
+                )}
+            </Droppable>
+            <React.Fragment>
+                <LaunchedHeader>L A U N C H E D</LaunchedHeader>
+                <Content>
+                    <div>
+                        {Object.keys(state.lists).map((list, i) => {
+                            const sortedList = sortList(state.lists[list]);
+                            return (
+                                <Droppable key={list} droppableId={list} isCombineEnabled>
+                                    {(provided, snapshot) => (
+                                        <Container
+                                            ref={provided.innerRef}
+                                            isDraggingOver={snapshot.isDraggingOver}>
+                                            {sortedList.length ? (
+                                                sortedList.map((item, index) => (
+                                                    <Draggable key={item.id} draggableId={item.id} index={index}>
+                                                        {(provided, snapshot) => (
+                                                            <Item
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                isDragging={snapshot.isDragging}
+                                                                style={provided.draggableProps.style}
+                                                                className={item.phase}
+                                                                id={`${item.id}:${index}`}>
+                                                                <Handle {...provided.dragHandleProps}>
+                                                                    <svg width="24" height="24" viewBox="0 0 24 24">
+                                                                        <path
+                                                                            fill="currentColor"
+                                                                            d="M3,15H21V13H3V15M3,19H21V17H3V19M3,11H21V9H3V11M3,5V7H21V5H3Z"
+                                                                        />
+                                                                    </svg>
+                                                                </Handle>
+                                                                <div className="flex-row cvh">
+                                                                    <div className="column-1">
+                                                                        <div className="cvh">{item.momentNumber}</div>
+                                                                    </div>
+                                                                    <div className="column-2">
+                                                                        <div className="cvh">{item.title}</div>
+                                                                    </div>
+                                                                    <div className="column-3" id={`timecode:${item.id}:${index}`} data-id={`${item.id}:${index}`}>
+                                                                        <a href="#" className="trigger cvh" data-id={`${item.id}:${index}`} onClick={handleTriggerClick}>LAUNCH</a>
+                                                                    </div>
+                                                                    <div className="column-4"></div>
+                                                                    <div className="column-5">
+                                                                        <a href="#" className="cvh trash" data-id={`${item.id}:${index}`} onClick={handleTrashClick}>
+                                                                            <span className="material-symbols-outlined">delete</span>
+                                                                        </a>
+                                                                    </div>
+                                                                </div>
+                                                            </Item>
+                                                        )}
+                                                    </Draggable>
+                                                ))
+                                            ) : !provided.placeholder ? (
+                                                <Notice>Drop items here</Notice>
+                                            ) : null}
+                                            {provided.placeholder}
+                                        </Container>
+                                    )}
+                                </Droppable>
+                            );
+                        })}
+                    </div>
+                </Content>
+            </React.Fragment>
+        </DragDropContext>
+    );
+};
 
 // Put the things into the DOM!
 ReactDOM.render(<App />, document.getElementById('root'));
-
-/*
-SWAP icon: <a href="https://iconscout.com/icons/swap" class="text-underline font-size-sm" target="_blank">Swap</a> by <a href="https://iconscout.com/contributors/daniel-bruce" class="text-underline font-size-sm" target="_blank">Daniel Bruce</a>
-
-TRASH ICON <a href="https://iconscout.com/icons/trash" class="text-underline font-size-sm" target="_blank">Trash</a> by <a href="https://iconscout.com/contributors/amit-jakhu" class="text-underline font-size-sm" target="_blank">Amit Jakhu</a>
- */
