@@ -146,7 +146,7 @@ ititle, .ititle {
     box-shadow: 2px 2px 5px #fc894d;
 }
 
-.staged .swapButton, .launched .launchButton, .launched .deleteButton {
+.staged .swapButton, .launched .launchButton {
     display: none;
 }
 
