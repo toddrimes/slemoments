@@ -148,10 +148,7 @@ ititle, .ititle {
     box-shadow: 2px 2px 5px #fc894d;
 }
 
-.timecode {
-    white-space: nowrap; /*Prevents Wrapping*/
-}
-.staged .swapButton, .staged .timecode,.launched .trigger {
+.staged .swapButton, .launched .trigger {
     display: none;
 }
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {IntlProvider, FormattedTime, useIntl} from 'react-intl';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -21,7 +20,6 @@ const globalLaunchDelayMinutes = 0.25;
 const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
 
 let updatedList = null;
-let hasJoinedARoom = true;
 
 let lastLaunch = 0 - (globalLaunchDelayMinutes * 60 * 1000);
 
@@ -47,10 +45,7 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
     if (!item.hasOwnProperty("timecode")) item.timecode = 9999999999999;
 
     destClone.splice(droppableDestination.index, 0, { ...item, id: uuid(), isCombineEnabled: true });
-
-    // for socket emit
     updatedList = destClone;
-
     return destClone;
 };
 
@@ -303,11 +298,9 @@ const App = () => {
                 lists: { [listId]: thisList }
             }
 
-            if(hasJoinedARoom){
-                socket.emit('stateChange', payload);
-                console.log('COMBINE stateChange emitted!');
-                console.dir(payload);
-            }
+            socket.emit('stateChange', payload);
+            console.log('COMBINE stateChange emitted!');
+            console.dir(payload);
 
             return;
         }
@@ -358,11 +351,9 @@ const App = () => {
         let payload = {
             lists: { [destination.droppableId]: updatedList }
         }
-        if(hasJoinedARoom) {
-            socket.emit('stateChange', payload);
-            console.log('INSERT/REORDER stateChange emitted!');
-            console.dir(payload);
-        }
+        socket.emit('stateChange', payload);
+        console.log('INSERT/REORDER stateChange emitted!');
+        console.dir(payload);
     };
 
     const addList = (e) => {
@@ -379,9 +370,7 @@ const App = () => {
         // if a content ID has been selected, join that room to get only its updates
         if(hasContentId) {
            socket.join(contentId);
-            hasJoinedARoom = true;
         }
-
         // Listen for changes from the server
         socket.on('stateChange', (newState) => {
             // Update your local state with the newState received from the server
@@ -394,7 +383,6 @@ const App = () => {
         // Clean up the socket connection when the component unmounts
         return () => {
             socket.disconnect();
-            hasJoinedARoom = false;
         };
     }, []);
 
@@ -418,15 +406,6 @@ const App = () => {
                 ...prevState,
                 lists: { [listId]: thisList },
             }));
-
-            if(hasJoinedARoom){
-                let payload = {
-                    lists: { [listId]: thisList }
-                }
-                socket.emit('stateChange', payload);
-                console.log('COMBINE stateChange emitted!');
-                console.dir(payload);
-            }
         }
     };
 
@@ -443,15 +422,15 @@ const App = () => {
 
             let itemId = event.target.getAttribute('data-id');
             let item = document.getElementById(`${itemId}`);
-/*            let launchDiv = document.getElementById(`timecode:${itemId}`);
+            let launchDiv = document.getElementById(`timecode:${itemId}`);
             let timeDiv = document.createDocumentFragment(
                 `<div classname="cvh" style="text-align: center">${updatedTime.human}</div>`
-            );*/
+            );
 
             item.classList.remove('staged');
             item.classList.add('launched');
-/*            launchDiv.innerHTML = '';
-            launchDiv.innerHTML = new Date(updatedTime.ms).toLocaleTimeString('en-US');*/
+            launchDiv.innerHTML = '';
+            launchDiv.innerHTML = new Date(updatedTime.ms).toLocaleTimeString('en-US');
 
             let listId = Object.keys(state.lists)[0];
             let thisList = state.lists[listId];
@@ -468,19 +447,12 @@ const App = () => {
                 counter++;
             }
 
+            let sortedList = sortList(thisList);
+
             setState((prevState) => ({
                 ...prevState,
-                lists: { [listId]: thisList },
+                lists: { [listId]: sortedList },
             }));
-
-            if(hasJoinedARoom){
-                let payload = {
-                    lists: { [listId]: thisList }
-                }
-                socket.emit('stateChange', payload);
-                console.log('COMBINE stateChange emitted!');
-                console.dir(payload);
-            }
         } else {
             alert(`No LAUNCH, must be at least ${globalLaunchDelayMinutes} minute(s) apart.`);
         }
@@ -560,7 +532,7 @@ const App = () => {
                                                                         />
                                                                     </svg>
                                                                 </Handle>
-                                                                <div className={`flex-row cvh ${item.phase}`}>
+                                                                <div className="flex-row cvh">
                                                                     <div className="column-1">
                                                                         <div className="cvh">{item.momentNumber}</div>
                                                                     </div>
@@ -568,7 +540,6 @@ const App = () => {
                                                                         <div className="cvh">{item.title}</div>
                                                                     </div>
                                                                     <div className="column-3" id={`timecode:${item.id}:${index}`} data-id={`${item.id}:${index}`}>
-                                                                        <div className="cvh timecode">{new Intl.DateTimeFormat('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(item.timecode)}</div>
                                                                         <a href="#" className="trigger cvh" data-id={`${item.id}:${index}`} onClick={handleTriggerClick}>LAUNCH</a>
                                                                     </div>
                                                                     <div className="column-4"></div>
@@ -599,10 +570,4 @@ const App = () => {
 };
 
 // Put the things into the DOM!
-// ReactDOM.render(<App />, document.getElementById('root'));
-ReactDOM.render(
-    <IntlProvider locale="en-US">
-        <App />
-    </IntlProvider>,
-    document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));
