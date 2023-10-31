@@ -5,10 +5,7 @@ import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import AssetSelect from './AssetSelect';
 import './index.css';
 import { v4 as uuid } from 'uuid';
-import io from "socket.io-client";
-
-// Initialize Socket.io connection
-const socket = io("http://localhost:5501", {});
+import {socket} from "./socket";
 
 const getParentValue = (varName) => {
     return false;
@@ -21,6 +18,8 @@ let globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
 const globalDelay = isNotTop ? getParentValue('delay') : 8;
 const globalLaunchDelayMinutes = 0.25;
 const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
+
+let updatedList = null;
 
 let lastLaunch = 0 - (globalLaunchDelayMinutes * 60 * 1000);
 
@@ -46,6 +45,7 @@ const copy = (source, destination, droppableSource, droppableDestination) => {
     if (!item.hasOwnProperty("timecode")) item.timecode = 9999999999999;
 
     destClone.splice(droppableDestination.index, 0, { ...item, id: uuid(), isCombineEnabled: true });
+    updatedList = destClone;
     return destClone;
 };
 
@@ -68,6 +68,9 @@ const move = (source, destination, droppableSource, droppableDestination) => {
     const result = {};
     result[droppableSource.droppableId] = sourceClone;
     result[droppableDestination.droppableId] = destClone;
+
+    // for socket emit
+    updatedList = destClone;
 
     return result;
 };
@@ -221,35 +224,12 @@ const ButtonText = styled.div`
   margin: 0 1rem;
 `;
 
-let ITEMS = [
-    {
-        id: uuid(),
-        content: 'Moment 1',
-    },
-    {
-        id: uuid(),
-        content: 'Moment 2'
-    },
-    {
-        id: uuid(),
-        content: 'Moment 3'
-    },
-    {
-        id: uuid(),
-        content: 'Moment 4'
-    },
-    {
-        id: uuid(),
-        content: 'Moment 5'
-    }
-];
-
 const App = () => {
     const [contentId, setContentId] = useState(null);
     const [hasContentId, setHasContentId] = useState(false);
     const [state, setState] = useState({
         lists: { [uuid()]: [] },
-        moments: ITEMS
+        moments: []
     });
 
     const handleMomentsChange = (newMoments) => {
@@ -258,14 +238,6 @@ const App = () => {
             moments: newMoments,
             lists: { [uuid()]: [] },
         }));
-
-        // Emit the new state to the server
-        socket.emit('stateChange', {
-            moments: newMoments,
-            lists: { [uuid()]: [] },
-            // Include any other relevant data in the emitted state
-        });
-        // debugger;
     };
 
     const handleAssetSelectChange = (selectedAssetId) => {
@@ -285,17 +257,8 @@ const App = () => {
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
                         }
-                        ITEMS = moments;
                         console.log(moments);
                         handleMomentsChange(moments);
-
-                        // Emit the new state to the server
-                        socket.emit('stateChange', {
-                            moments: moments,
-                            lists: { [uuid()]: [] },
-                            // Include any other relevant data in the emitted state
-                        });
-                        // debugger;
                     }
                 });
         } else {
@@ -315,7 +278,7 @@ const App = () => {
         if (result.combine) {
             let targetId = result.combine.draggableId;
             let itemsSourceIndex = result.source.index;
-            let sourceObject = ITEMS[itemsSourceIndex];
+            let sourceObject = state.moments[itemsSourceIndex];
             let listId = Object.keys(state.lists)[0];
             let thisList = state.lists[listId];
 
@@ -330,6 +293,14 @@ const App = () => {
                 ...prevState,
                 lists: { [listId]: thisList },
             }));
+
+            let payload = {
+                lists: { [listId]: thisList }
+            }
+
+            socket.emit('stateChange', payload);
+            console.log('COMBINE stateChange emitted!');
+            console.dir(payload);
 
             return;
         }
@@ -350,8 +321,8 @@ const App = () => {
                     ),
                 }));
                 break;
-            case 'ITEMS':
-                console.log("switch01");
+            case 'moments':
+                console.log("switch02");
                 setState((prevState) => ({
                     ...prevState,
                     lists: {
@@ -365,7 +336,7 @@ const App = () => {
                 }));
                 break;
             default:
-                console.log("switch01");
+                console.log("switch03");
                 setState(
                     move(
                         state.lists[source.droppableId],
@@ -376,6 +347,13 @@ const App = () => {
                 );
                 break;
         }
+
+        let payload = {
+            lists: { [destination.droppableId]: updatedList }
+        }
+        socket.emit('stateChange', payload);
+        console.log('INSERT/REORDER stateChange emitted!');
+        console.dir(payload);
     };
 
     const addList = (e) => {
@@ -386,10 +364,20 @@ const App = () => {
     };
 
     useEffect(() => {
+
+        socket.connect();
+
+        // if a content ID has been selected, join that room to get only its updates
+        if(hasContentId) {
+           socket.join(contentId);
+        }
         // Listen for changes from the server
         socket.on('stateChange', (newState) => {
             // Update your local state with the newState received from the server
-            setState(newState);
+            setState((prevState) => ({
+                ...prevState,
+                lists: newState.lists
+            }));
         });
 
         // Clean up the socket connection when the component unmounts
@@ -424,7 +412,7 @@ const App = () => {
     const handleTriggerClick = (event) => {
         let updatedTime = updateTime(globalDelay);
         let glds = globalLaunchDelayMinutes * 60 * 1000;
-        debugger;
+
         let nextPossibleLaunch = lastLaunch + glds;
         if (updatedTime.ms >= nextPossibleLaunch) {
             setState((prevState) => ({
@@ -482,7 +470,7 @@ const App = () => {
                     </DeadZone>
                 </React.Fragment>
             )}
-            <Droppable droppableId="ITEMS" isDropDisabled={true}>
+            <Droppable droppableId="moments" isDropDisabled={true}>
                 {(provided, snapshot) => (
                     <Kiosk ref={provided.innerRef} isDraggingOver={snapshot.isDraggingOver}>
                         <ColumnHeader>E D I T O R I A L</ColumnHeader>
