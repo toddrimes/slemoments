@@ -243,6 +243,11 @@ const App = () => {
             moments: newMoments,
             lists: { [uuid()]: [] },
         }));
+        setTimeout(() => {
+            if(newMoments.length > 0) {
+                socket.emit('init', globalAssetId);
+            }
+        }, 1000);
     };
 
     const handleAssetSelectChange = (selectedAssetId) => {
@@ -391,11 +396,13 @@ const App = () => {
         // Listen for changes from the server
         socket.on('stateChange', (newState) => {
             // Update your local state with the newState received from the server
-            if(globalAssetId===newState.contentId) {
+            if(newState && globalAssetId===newState._id) {
                 setState((prevState) => ({
                     ...prevState,
                     lists: newState.lists
                 }));
+                console.log('received data from server');
+                console.dir(newState);
             }
         });
 
@@ -432,7 +439,7 @@ const App = () => {
                     lists: { [listId]: thisList }
                 }
                 socket.emit('stateChange', payload);
-                console.log('COMBINE stateChange emitted!');
+                console.log('TRASH stateChange emitted!');
                 console.dir(payload);
             }
         }
@@ -487,7 +494,7 @@ const App = () => {
                     lists: { [listId]: thisList }
                 }
                 socket.emit('stateChange', payload);
-                console.log('COMBINE stateChange emitted!');
+                console.log('LAUNCHED stateChange emitted!');
                 console.dir(payload);
             }
         } else {
