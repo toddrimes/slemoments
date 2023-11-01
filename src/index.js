@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {IntlProvider, FormattedTime, useIntl} from 'react-intl';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
@@ -18,7 +17,6 @@ const isNotTop = topURL.indexOf('brb');
 let globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
 const globalDelay = isNotTop ? getParentValue('delay') : 8;
 const globalLaunchDelayMinutes = 0.25;
-const globalUserId = isNotTop ? getParentValue('userId') : '206463869';
 
 let updatedList = null;
 let hasJoinedARoom = true;
@@ -618,10 +616,4 @@ const App = () => {
 };
 
 // Put the things into the DOM!
-// ReactDOM.render(<App />, document.getElementById('root'));
-ReactDOM.render(
-    <IntlProvider locale="en-US">
-        <App />
-    </IntlProvider>,
-    document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));
