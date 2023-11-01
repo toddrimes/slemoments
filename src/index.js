@@ -32,7 +32,7 @@ const setAssetId = (selAssetId) => {
 const reorder = (list, startIndex, endIndex) => {
     const result = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
+    result.splice(endIndex, 0, removed)
     return result;
 };
 
@@ -261,6 +261,8 @@ const App = () => {
                         let moments = data.moments.sort((a, b) => a.momentNumber - b.momentNumber);
                         for (let i = 0; i < moments.length; i++) {
                             moments[i].id = moments[i].momentNumber;
+                            moments[i].phase = "staged";
+                            moments[i].timecode = 9999999999999;
                         }
                         console.log(moments);
                         handleMomentsChange(moments);
@@ -316,29 +318,35 @@ const App = () => {
             return;
         }
 
+        let updatedList = null;
+
         switch (source.droppableId) {
             case destination.droppableId:
                 console.log("switch01");
+                updatedList = reorder(
+                    state.lists[source.droppableId],
+                    source.index,
+                    destination.index
+                );
                 setState((prevState) => ({
                     ...prevState,
-                    [destination.droppableId]: reorder(
-                        state.lists[source.droppableId],
-                        source.index,
-                        destination.index
-                    ),
+                    lists: {
+                        [destination.droppableId]: updatedList
+                    },
                 }));
                 break;
             case 'moments':
                 console.log("switch02");
+                updatedList = copy(
+                    state.moments,
+                    state.lists[destination.droppableId],
+                    source,
+                    destination
+                );
                 setState((prevState) => ({
                     ...prevState,
                     lists: {
-                        [destination.droppableId]: copy(
-                            state.moments,
-                            state.lists[destination.droppableId],
-                            source,
-                            destination
-                        ),
+                        [destination.droppableId]: updatedList,
                     },
                 }));
                 break;
@@ -560,7 +568,7 @@ const App = () => {
                                                                         />
                                                                     </svg>
                                                                 </Handle>
-                                                                <div className={`flex-row cvh ${item.phase}`}>
+                                                                <div className={`flex-row cvh`}>
                                                                     <div className="column-1">
                                                                         <div className="cvh">{item.momentNumber}</div>
                                                                     </div>
@@ -568,8 +576,11 @@ const App = () => {
                                                                         <div className="cvh">{item.title}</div>
                                                                     </div>
                                                                     <div className="column-3" id={`timecode:${item.id}:${index}`} data-id={`${item.id}:${index}`}>
+                                                                        { item.phase==="launched" ? (
                                                                         <div className="cvh timecode">{new Intl.DateTimeFormat('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(item.timecode)}</div>
+                                                                        ) : (
                                                                         <a href="#" className="trigger cvh" data-id={`${item.id}:${index}`} onClick={handleTriggerClick}>LAUNCH</a>
+                                                                        )}
                                                                     </div>
                                                                     <div className="column-4"></div>
                                                                     <div className="column-5">
