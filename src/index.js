@@ -251,6 +251,7 @@ const App = () => {
         if (selectedAssetId !== '' && selectedAssetId != null) {
             setHasContentId(true);
             setContentId(selectedAssetId);
+            globalAssetId = selectedAssetId;
 
             fetch(
                 `https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`
@@ -269,6 +270,7 @@ const App = () => {
                     }
                 });
         } else {
+            setContentId(null);
             setHasContentId(false);
             setState((prevState) => ({
                 ...prevState,
@@ -302,6 +304,7 @@ const App = () => {
             }));
 
             let payload = {
+                contentId: contentId,
                 lists: { [listId]: thisList }
             }
 
@@ -364,6 +367,7 @@ const App = () => {
         }
 
         let payload = {
+            contentId: contentId,
             lists: { [destination.droppableId]: updatedList }
         }
         if(hasJoinedARoom) {
@@ -384,25 +388,20 @@ const App = () => {
 
         socket.connect();
 
-        // if a content ID has been selected, join that room to get only its updates
-        if(hasContentId) {
-           socket.join(contentId);
-            hasJoinedARoom = true;
-        }
-
         // Listen for changes from the server
         socket.on('stateChange', (newState) => {
             // Update your local state with the newState received from the server
-            setState((prevState) => ({
-                ...prevState,
-                lists: newState.lists
-            }));
+            if(globalAssetId===newState.contentId) {
+                setState((prevState) => ({
+                    ...prevState,
+                    lists: newState.lists
+                }));
+            }
         });
 
         // Clean up the socket connection when the component unmounts
         return () => {
             socket.disconnect();
-            hasJoinedARoom = false;
         };
     }, []);
 
@@ -429,6 +428,7 @@ const App = () => {
 
             if(hasJoinedARoom){
                 let payload = {
+                    contentId: contentId,
                     lists: { [listId]: thisList }
                 }
                 socket.emit('stateChange', payload);
@@ -483,6 +483,7 @@ const App = () => {
 
             if(hasJoinedARoom){
                 let payload = {
+                    contentId: contentId,
                     lists: { [listId]: thisList }
                 }
                 socket.emit('stateChange', payload);
