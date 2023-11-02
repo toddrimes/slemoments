@@ -1,3 +1,4 @@
+const config = require('dotenv').config()
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';

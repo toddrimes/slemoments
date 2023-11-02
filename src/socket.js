@@ -1,4 +1,4 @@
-// import { io } from 'socket.io-client';
+const config = require('dotenv').config()
 import {io} from 'socket.io-client/dist/socket.io.js';
 
 const SOCKET_PORT = process.env.SOCKET_PORT || 5501;
