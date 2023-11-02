@@ -160,3 +160,16 @@ ititle, .ititle {
 div.launched, div.staged {
     min-height: 55px;
 }
+
+.staged {
+    color: blue;
+}
+
+.launched {
+    color: black;
+}
+
+.pending {
+    color: black;
+    background-color: palegoldenrod !important;
+}
