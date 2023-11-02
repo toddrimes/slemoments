@@ -162,14 +162,16 @@ div.launched, div.staged {
 }
 
 .staged {
-    color: blue;
+    color: black;
+    background-color: white;
 }
 
 .launched {
     color: black;
+    background-color: darkseagreen !important;
 }
 
 .pending {
     color: black;
-    background-color: palegoldenrod !important;
+    background-color: lightskyblue !important;
 }
