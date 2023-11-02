@@ -228,6 +228,7 @@ const ButtonText = styled.div`
 `;
 
 const App = () => {
+    console.log("process.env.NODE_ENV is " + process.env.NODE_ENV);
     const [contentId, setContentId] = useState(null);
     const [hasContentId, setHasContentId] = useState(false);
     const [state, setState] = useState({
