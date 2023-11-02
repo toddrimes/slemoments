@@ -1,4 +1,3 @@
-const config = require('dotenv').config()
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
@@ -7,6 +6,9 @@ import AssetSelect from './AssetSelect';
 import './index.css';
 import { v4 as uuid } from 'uuid';
 import {socket} from "./socket";
+import dotenv from 'dotenv';
+
+const config = dotenv.config()
 
 const getParentValue = (varName) => {
     return false;
