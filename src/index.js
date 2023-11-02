@@ -6,6 +6,9 @@ import AssetSelect from './AssetSelect';
 import './index.css';
 import { v4 as uuid } from 'uuid';
 import {socket} from "./socket";
+import dotenv from 'dotenv';
+
+const config = dotenv.config()
 
 const getParentValue = (varName) => {
     return false;
