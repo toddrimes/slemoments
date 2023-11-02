@@ -18,23 +18,23 @@ ititle, .ititle {
 .trash {
     height: 12px;
 }
- .material-symbols-outlined {
-     font-variation-settings:
-             'FILL' 0,
-             'wght' 400,
-             'GRAD' 0,
-             'opsz' 24
- }
- .logo {
-     background-image: url("./images/IoS-logo.png");
-     height: 405px;
-     background-repeat: no-repeat;
-     background-position: top;
-     width: 180px;
- }
- .launch {
+.material-symbols-outlined {
+    font-variation-settings:
+            'FILL' 0,
+            'wght' 400,
+            'GRAD' 0,
+            'opsz' 24
+}
+.logo {
+    background-image: url("./images/IoS-logo.png");
+    height: 405px;
+    background-repeat: no-repeat;
+    background-position: top;
+    width: 180px;
+}
+.launch {
 
- }
+}
 .flex-row {
     display: flex;
     flex-wrap: wrap;
@@ -159,4 +159,19 @@ ititle, .ititle {
 
 div.launched, div.staged {
     min-height: 55px;
+}
+
+.staged {
+    color: black;
+    background-color: white;
+}
+
+.launched {
+    color: black;
+    background-color: darkseagreen !important;
+}
+
+.pending {
+    color: black;
+    background-color: lightskyblue !important;
 }

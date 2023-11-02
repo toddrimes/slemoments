@@ -14,9 +14,12 @@ const getParentValue = (varName) => {
 const topURL = window.location.href;
 const isNotTop = topURL.indexOf('brb');
 
-let globalAssetId = isNotTop ? getParentValue('assetId') : 'peacock_604689';
-const globalDelay = isNotTop ? getParentValue('delay') : 8;
+let globalAssetId = isNotTop ? 'peacock_604689' : getParentValue('assetId');
+const globalDelaySeconds = isNotTop ? 10 : getParentValue('delay');
+const globalUserSSO = isNotTop ? "206463869" : getParentValue('userSSO');
+const globalUserName = isNotTop ? "Todd Rimes" : getParentValue('userName');
 const globalLaunchDelayMinutes = 0.25;
+
 
 let updatedList = null;
 let hasJoinedARoom = true;
@@ -135,7 +138,7 @@ const Handle = styled.div`
   padding: 0.5rem;
   line-height: 1.5;
   border-radius: 3px 0 0 3px;
-  background: #fff;
+  /* background: #fff; */
   border-right: 1px solid #ddd;
   color: #000;
 `;
@@ -229,6 +232,7 @@ const ButtonText = styled.div`
 
 const App = () => {
     console.log("process.env.NODE_ENV is " + process.env.NODE_ENV);
+    const [time, setTime] = useState(new Date());
     const [contentId, setContentId] = useState(null);
     const [hasContentId, setHasContentId] = useState(false);
     const [state, setState] = useState({
@@ -308,6 +312,8 @@ const App = () => {
             }));
 
             let payload = {
+                userSSO: globalUserSSO,
+                userName: globalUserName,
                 contentId: contentId,
                 lists: { [listId]: thisList }
             }
@@ -371,6 +377,8 @@ const App = () => {
         }
 
         let payload = {
+            userSSO: globalUserSSO,
+            userName: globalUserName,
             contentId: contentId,
             lists: { [destination.droppableId]: updatedList }
         }
@@ -390,6 +398,10 @@ const App = () => {
 
     useEffect(() => {
 
+        const interval = setInterval(() => {
+            setTime(new Date());
+        }, 1000);
+
         socket.connect();
 
         // Listen for changes from the server
@@ -408,19 +420,22 @@ const App = () => {
         // Clean up the socket connection when the component unmounts
         return () => {
             socket.disconnect();
+            clearInterval(interval);
         };
     }, []);
 
-    const updateTime = (secondsToAdd = 0) => {
-        let currentTime = new Date();
-        let currentTimeMillis = currentTime.getTime() + secondsToAdd * 1000;
-        let currentUTCTime = new Date(currentTimeMillis).toUTCString();
+    const updateTime = (secondsToAdd) => {
+        let currentTime = time;
+        let currentTimeMillis = currentTime.getTime();
+        let millisecondsToAdd = secondsToAdd * 1000;
+        let offsetTimeMillis = currentTimeMillis + millisecondsToAdd;
+        let offsetUTCTime = new Date(offsetTimeMillis).toUTCString();
 
-        return { ms: currentTimeMillis, human: currentUTCTime };
+        return { ms: offsetTimeMillis, human: offsetUTCTime };
     };
 
     const handleTrashClick = (event) => {
-        let updatedTime = updateTime(0);
+        let updatedTime = updateTime(globalDelaySeconds);
         let itemId = event.target.parentNode.getAttribute('data-id');
         if (itemId) {
             let rawIndex = itemId.split(':')[1];
@@ -434,6 +449,8 @@ const App = () => {
 
             if(hasJoinedARoom){
                 let payload = {
+                    userSSO: globalUserSSO,
+                    userName: globalUserName,
                     contentId: contentId,
                     lists: { [listId]: thisList }
                 }
@@ -445,7 +462,7 @@ const App = () => {
     };
 
     const handleTriggerClick = (event) => {
-        let updatedTime = updateTime(globalDelay);
+        let updatedTime = updateTime(globalDelaySeconds);
         let glds = globalLaunchDelayMinutes * 60 * 1000;
 
         let nextPossibleLaunch = lastLaunch + glds;
@@ -457,15 +474,9 @@ const App = () => {
 
             let itemId = event.target.getAttribute('data-id');
             let item = document.getElementById(`${itemId}`);
-/*            let launchDiv = document.getElementById(`timecode:${itemId}`);
-            let timeDiv = document.createDocumentFragment(
-                `<div classname="cvh" style="text-align: center">${updatedTime.human}</div>`
-            );*/
 
             item.classList.remove('staged');
             item.classList.add('launched');
-/*            launchDiv.innerHTML = '';
-            launchDiv.innerHTML = new Date(updatedTime.ms).toLocaleTimeString('en-US');*/
 
             let listId = Object.keys(state.lists)[0];
             let thisList = state.lists[listId];
@@ -489,6 +500,8 @@ const App = () => {
 
             if(hasJoinedARoom){
                 let payload = {
+                    userSSO: globalUserSSO,
+                    userName: globalUserName,
                     contentId: contentId,
                     lists: { [listId]: thisList }
                 }
@@ -565,8 +578,7 @@ const App = () => {
                                                                 {...provided.draggableProps}
                                                                 isDragging={snapshot.isDragging}
                                                                 style={provided.draggableProps.style}
-                                                                className={item.phase}
-                                                                id={`${item.id}:${index}`}>
+                                                                id={`${item.id}:${index}`} className={item.phase==='launched' && item.timecode > time.getTime() ? "pending " + item.phase : item.phase}>
                                                                 <Handle {...provided.dragHandleProps}>
                                                                     <svg width="24" height="24" viewBox="0 0 24 24">
                                                                         <path
@@ -584,12 +596,12 @@ const App = () => {
                                                                     </div>
                                                                     <div className="column-3" id={`timecode:${item.id}:${index}`} data-id={`${item.id}:${index}`}>
                                                                         { item.phase==="launched" ? (
-                                                                        <div className="cvh timecode">{new Intl.DateTimeFormat('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(item.timecode)}</div>
+                                                                            <div className="cvh timecode">{new Intl.DateTimeFormat('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit'}).format(item.timecode)}</div>
                                                                         ) : (
-                                                                        <a href="#" className="trigger cvh" data-id={`${item.id}:${index}`} onClick={handleTriggerClick}>LAUNCH</a>
+                                                                            <a href="#" className="trigger cvh" data-id={`${item.id}:${index}`} onClick={handleTriggerClick}>LAUNCH</a>
                                                                         )}
                                                                     </div>
-                                                                    <div className="column-4"></div>
+                                                                    <div className="column-4"/>
                                                                     <div className="column-5">
                                                                         <a href="#" className="cvh trash" data-id={`${item.id}:${index}`} onClick={handleTrashClick}>
                                                                             <span className="material-symbols-outlined">delete</span>
