@@ -13,7 +13,7 @@
     "react-beautiful-dnd": "10.0.4",
     "react-dom": "^16.14.0",
     "react-intl": "^6.5.1",
-    "react-scripts": "^1.1.5",
+    "react-scripts": "^2.0.0",
     "socket.io-client": "^4.7.2",
     "state-pool": "^0.10.0",
     "styled-components": "^6.1.0",
