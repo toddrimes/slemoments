@@ -6,6 +6,8 @@ import AssetSelect from './AssetSelect';
 import './index.css';
 import { v4 as uuid } from 'uuid';
 import {socket} from "./socket";
+const dotenv = require('dotenv')
+
 
 const getParentValue = (varName) => {
     return false;
@@ -260,10 +262,8 @@ const App = () => {
             setHasContentId(true);
             setContentId(selectedAssetId);
             globalAssetId = selectedAssetId;
-
-            fetch(
-                `https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`
-            )
+// `https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`
+            fetch(`http://localhost:5501/api/dnoc/assets/${selectedAssetId}/overlay`)
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.moments) {

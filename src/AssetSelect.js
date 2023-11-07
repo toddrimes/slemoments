@@ -11,8 +11,9 @@ function AssetSelect(props) {
         props.onAssetSelectChange(selectedAssetId);
     };
 
+    // fetch('https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets')
     useEffect(() => {
-        fetch('https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets')
+        fetch('http://localhost:5501/api/dnoc/assets')
             .then((response) => response.json())
             .then((data) => {
                 let items = data.items;
