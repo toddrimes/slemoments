@@ -13,7 +13,7 @@ function AssetSelect(props) {
 
     // fetch('https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets')
     useEffect(() => {
-        fetch('http://localhost:5501/api/dnoc/assets')
+        fetch('https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets')
             .then((response) => response.json())
             .then((data) => {
                 let items = data.items;

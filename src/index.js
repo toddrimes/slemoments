@@ -263,7 +263,7 @@ const App = () => {
             setContentId(selectedAssetId);
             globalAssetId = selectedAssetId;
 // `https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`
-            fetch(`http://localhost:5501/api/dnoc/assets/${selectedAssetId}/overlay`)
+            fetch(`https://momentsapi-tr-0b46d75889bf.herokuapp.com/api/dnoc/assets/${selectedAssetId}/overlay`)
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.moments) {
